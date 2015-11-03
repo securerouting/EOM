@@ -1,0 +1,283 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>eom.aggregator &mdash; eom  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="eom  documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">eom  documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for eom.aggregator</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;Implementation of the data aggregation module for EOM.</span>
+
+<span class="sd">This module interfaces with various fetcher modules and stores the</span>
+<span class="sd">retrieved data into a persistent data store (database).</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">sqlite3</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<div class="viewcode-block" id="EOMAggregator"><a class="viewcode-back" href="../../eom.html#eom.aggregator.EOMAggregator">[docs]</a><span class="k">class</span> <span class="nc">EOMAggregator</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A RPKI-Rtr and RIB data aggregator.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dbfile</span><span class="o">=</span><span class="s">&quot;eom_default_db.sqlite&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Instantiate the data aggregator object.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dbfile (str): The name of the database file. If a value is</span>
+<span class="sd">                          not provided, it defaults to</span>
+<span class="sd">                          &#39;eom_default_db.sqlite&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dbfile</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">dbfile</span><span class="p">,</span> <span class="n">detect_types</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">PARSE_DECLTYPES</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">text_factory</span> <span class="o">=</span> <span class="nb">str</span>
+        <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">init_rpki_rtr_tables</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">init_rib_tables</span><span class="p">()</span>
+
+<div class="viewcode-block" id="EOMAggregator.get_sql_connection"><a class="viewcode-back" href="../../eom.html#eom.aggregator.EOMAggregator.get_sql_connection">[docs]</a>    <span class="k">def</span> <span class="nf">get_sql_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get an instance to the sql connection object.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span>
+</div>
+<div class="viewcode-block" id="EOMAggregator.init_rpki_rtr_tables"><a class="viewcode-back" href="../../eom.html#eom.aggregator.EOMAggregator.init_rpki_rtr_tables">[docs]</a>    <span class="k">def</span> <span class="nf">init_rpki_rtr_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize rpki-rtr database tables.</span>
+<span class="sd">       </span>
+<span class="sd">        Three tables are created - one that keeps track of the rpki-rtr</span>
+<span class="sd">        session, one that keeps track of the prefixes associated with</span>
+<span class="sd">        each active rpki-rtr session, and finally one for storing router</span>
+<span class="sd">        key information.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;PRAGMA foreign_keys = on&quot;</span><span class="p">)</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&#39;&#39;&#39;</span>
+<span class="s">                CREATE TABLE cache (</span>
+<span class="s">                    cache_id        INTEGER PRIMARY KEY NOT NULL,</span>
+<span class="s">                    host            TEXT NOT NULL,</span>
+<span class="s">                    port            TEXT NOT NULL,</span>
+<span class="s">                    version         INTEGER,</span>
+<span class="s">                    nonce           INTEGER,</span>
+<span class="s">                    serial          INTEGER,</span>
+<span class="s">                    updated         INTEGER,</span>
+<span class="s">                    refresh         INTEGER,</span>
+<span class="s">                    retry           INTEGER,</span>
+<span class="s">                    expire          INTEGER,</span>
+<span class="s">                    UNIQUE          (host, port))&#39;&#39;&#39;</span><span class="p">)</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&#39;&#39;&#39;</span>
+<span class="s">                CREATE TABLE prefix (</span>
+<span class="s">                    cache_id        INTEGER NOT NULL</span>
+<span class="s">                                    REFERENCES cache(cache_id)</span>
+<span class="s">                                    ON DELETE CASCADE</span>
+<span class="s">                                    ON UPDATE CASCADE,</span>
+<span class="s">                    asn             INTEGER NOT NULL,</span>
+<span class="s">                    prefix          TEXT NOT NULL,</span>
+<span class="s">                    prefixlen       INTEGER NOT NULL,</span>
+<span class="s">                    max_prefixlen   INTEGER NOT NULL,</span>
+<span class="s">                    prefix_min      TEXT NOT NULL,</span>
+<span class="s">                    prefix_max      TEXT NOT NULL,</span>
+<span class="s">                    UNIQUE          (cache_id, asn, prefix, prefixlen, max_prefixlen))&#39;&#39;&#39;</span><span class="p">)</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&#39;&#39;&#39;</span>
+<span class="s">                CREATE TABLE routerkey (</span>
+<span class="s">                    cache_id        INTEGER NOT NULL</span>
+<span class="s">                                    REFERENCES cache(cache_id)</span>
+<span class="s">                                    ON DELETE CASCADE</span>
+<span class="s">                                    ON UPDATE CASCADE,</span>
+<span class="s">                    asn             INTEGER NOT NULL,</span>
+<span class="s">                    ski             TEXT NOT NULL,</span>
+<span class="s">                    key             TEXT NOT NULL,</span>
+<span class="s">                    UNIQUE          (cache_id, asn, ski),</span>
+<span class="s">                    UNIQUE          (cache_id, asn, key))&#39;&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="EOMAggregator.init_rib_tables"><a class="viewcode-back" href="../../eom.html#eom.aggregator.EOMAggregator.init_rib_tables">[docs]</a>    <span class="k">def</span> <span class="nf">init_rib_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize RIB database tables.</span>
+<span class="sd">       </span>
+<span class="sd">        Two tables are created. One stores the rtr ID associated with a</span>
+<span class="sd">        given device that is to be queried, while the second stores</span>
+<span class="sd">        different route attributes gleaned from &#39;sh ip bgp&#39; command.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;PRAGMA foreign_keys = on&quot;</span><span class="p">)</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&#39;&#39;&#39;</span>
+<span class="s">                CREATE TABLE rtr_cache (</span>
+<span class="s">                    rtr_id          INTEGER PRIMARY KEY NOT NULL,</span>
+<span class="s">                    device          TEXT NOT NULL,</span>
+<span class="s">                    UNIQUE          (device))&#39;&#39;&#39;</span><span class="p">)</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&#39;&#39;&#39;</span>
+<span class="s">                CREATE TABLE rtr_rib (</span>
+<span class="s">                    rtr_id          INTEGER NOT NULL</span>
+<span class="s">                                    REFERENCES rtr_cache(rtr_id)</span>
+<span class="s">                                    ON DELETE CASCADE</span>
+<span class="s">                                    ON UPDATE CASCADE,</span>
+<span class="s">                    idx             INTEGER NOT NULL,</span>
+<span class="s">                    status          TEXT,</span>
+<span class="s">                    pfx             TEXT NOT NULL,</span>
+<span class="s">                    pfxlen          INTEGER NOT NULL,</span>
+<span class="s">                    pfxstr_min      TEXT NOT NULL,</span>
+<span class="s">                    pfxstr_max      TEXT NOT NULL,</span>
+<span class="s">                    nexthop         TEXT NOT NULL,</span>
+<span class="s">                    metric          INTEGER,</span>
+<span class="s">                    locpref         INTEGER,</span>
+<span class="s">                    weight          INTEGER,</span>
+<span class="s">                    pathbutone      TEXT,</span>
+<span class="s">                    orig_asn        INTEGER NOT NULL,</span>
+<span class="s">                    route_orig      TEXT)&#39;&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="EOMAggregator.reset_rpki_rtr_session"><a class="viewcode-back" href="../../eom.html#eom.aggregator.EOMAggregator.reset_rpki_rtr_session">[docs]</a>    <span class="k">def</span> <span class="nf">reset_rpki_rtr_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Reset an existing rpki-rtr session.</span>
+
+<span class="sd">        Reset any existing rpki-rtr session for the given host and</span>
+<span class="sd">        port.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            host (string): the rpki-rtr server host </span>
+<span class="sd">            port (string): the rpki-rtr server port </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;DELETE FROM cache WHERE host = ? and port = ?&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="EOMAggregator.reset_rtr_rib_session"><a class="viewcode-back" href="../../eom.html#eom.aggregator.EOMAggregator.reset_rtr_rib_session">[docs]</a>    <span class="k">def</span> <span class="nf">reset_rtr_rib_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Reset a RIB query session.</span>
+
+<span class="sd">        Delete any state corresponding to a RIB query that was issued</span>
+<span class="sd">        for a particular router device.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            device(string): The device identifier.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;DELETE FROM rtr_cache WHERE device = ?&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="EOMAggregator.get_rpki_rib"><a class="viewcode-back" href="../../eom.html#eom.aggregator.EOMAggregator.get_rpki_rib">[docs]</a>    <span class="k">def</span> <span class="nf">get_rpki_rib</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetch rib information in conjunction with rpki information.</span>
+
+<span class="sd">        Construct a database &#39;join&#39; of the contents of currently available</span>
+<span class="sd">        rpki-rtr information with currently available RIB information.</span>
+<span class="sd">        The join is constructed over matching prefix ranges; that is,</span>
+<span class="sd">        for cases where the rpki rtr ROA covers the route prefix in the</span>
+<span class="sd">        RIB.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;SELECT rtr_id, idx, asn, prefix, prefixlen, &quot;</span>
+                    <span class="s">&quot;   max_prefixlen, status, pfx, pfxlen, pfxstr_min, pfxstr_max, &quot;</span>
+                    <span class="s">&quot;   nexthop, metric, locpref, weight, pathbutone, orig_asn, route_orig &quot;</span>
+                    <span class="s">&quot;FROM prefix INNER JOIN rtr_rib ON &quot;</span>
+                    <span class="s">&quot;   prefix_min &lt;= pfxstr_min AND pfxstr_max &lt;= prefix_max&quot;</span><span class="p">,())</span>
+        <span class="k">return</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="EOMAggregator.get_covering"><a class="viewcode-back" href="../../eom.html#eom.aggregator.EOMAggregator.get_covering">[docs]</a>    <span class="k">def</span> <span class="nf">get_covering</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rtr_id</span><span class="p">,</span> <span class="n">pfxstr_min</span><span class="p">,</span> <span class="n">pfxstr_max</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetch route entries that cover a given prefix range.</span>
+
+<span class="sd">        Select those routes whose advertised address range covers the</span>
+<span class="sd">        given prefix range.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            rtr_id(string): the router id</span>
+<span class="sd">            pfxstr_min(string): the lower value in the prefix range</span>
+<span class="sd">            pfxstr_max(string): the upper value in the prefix range</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;SELECT idx, status, pfx, pfxlen, pfxstr_min, pfxstr_max, nexthop, metric, &quot;</span>
+                    <span class="s">&quot;   locpref, weight, pathbutone, orig_asn, route_orig &quot;</span>
+                    <span class="s">&quot;FROM rtr_rib &quot;</span>
+                    <span class="s">&quot;WHERE rtr_id = ? AND pfxstr_min &lt;= ? AND pfxstr_max &gt;= ?&quot;</span><span class="p">,</span>
+                    <span class="p">(</span><span class="n">rtr_id</span><span class="p">,</span> <span class="n">pfxstr_min</span><span class="p">,</span> <span class="n">pfxstr_max</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.4</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>eom.do_poll &mdash; eom  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="eom  documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">eom  documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for eom.do_poll</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/python</span>
+
+<span class="sd">&quot;&quot;&quot; Fetch RIB information from routers.</span>
+
+<span class="sd">This scripts queries the given device for its RIB information using the</span>
+<span class="sd">&#39;sh ip bgp&#39; command. The script assumes that one of either Trigger or</span>
+<span class="sd">RANCID has been configured in order to enable the router to authenticate</span>
+<span class="sd">the issuance of such commands from the querying machine.</span>
+
+<span class="sd">NOTE: That RANCID support appears to be not fully supported in Trigger,</span>
+<span class="sd">so this does not seem to work properly at the moment.</span>
+
+<span class="sd">The output is returned as a JSON representation of a dict structure,</span>
+<span class="sd">indexed on the device name and the command run.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">trigger</span> <span class="kn">import</span> <span class="n">rancid</span><span class="p">,</span><span class="n">netdevices</span><span class="p">,</span><span class="n">cmds</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">call</span>
+
+<span class="c">#RANCID_ROOT = &#39;/path/to/rancid/routers&#39;</span>
+<span class="n">RANCID_ROOT</span> <span class="o">=</span> <span class="s">&#39;/Volumes/Secondary/tmp/rancid/routers&#39;</span>
+
+<div class="viewcode-block" id="CommandWrapper"><a class="viewcode-back" href="../../eom.html#eom.do_poll.CommandWrapper">[docs]</a><span class="k">class</span> <span class="nc">CommandWrapper</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Generic Command Wrapper Class.</span>
+
+<span class="sd">    Allows us to poll the attached net devices for BGP information. </span>
+<span class="sd">    Note that this class must not be instantiated directly.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">devicenames</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Base class constructor.</span>
+<span class="sd">        </span>
+<span class="sd">        Args:</span>
+<span class="sd">            devicenames(list of strs): A list of device names</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">command</span> <span class="o">=</span> <span class="s">&#39;show ip bgp&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">devicelist</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="CommandWrapper.poll"><a class="viewcode-back" href="../../eom.html#eom.do_poll.CommandWrapper.poll">[docs]</a>    <span class="k">def</span> <span class="nf">poll</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Poll device list for BGP RIB information.</span>
+
+<span class="sd">        Poll all the NetDevices that are associated with this object and</span>
+<span class="sd">        query them for BGP RIB information using &#39;sh ip bgp&#39;. The</span>
+<span class="sd">        results are returned as a JSON string.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            None.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: A JSON string representation of the results</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">cmds</span><span class="o">.</span><span class="n">Commando</span><span class="p">(</span><span class="n">devices</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">devicelist</span><span class="p">,</span> <span class="n">commands</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">c</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">results</span><span class="p">))</span>
+</div></div>
+<div class="viewcode-block" id="RancidCommandWrapper"><a class="viewcode-back" href="../../eom.html#eom.do_poll.RancidCommandWrapper">[docs]</a><span class="k">class</span> <span class="nc">RancidCommandWrapper</span><span class="p">(</span><span class="n">CommandWrapper</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Subclass for issuing router commands using RANCID&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">devicenames</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;constructor.</span>
+<span class="sd">       </span>
+<span class="sd">        Initialize the RancidCommandWrapper object. Also convert the</span>
+<span class="sd">        list of devices in devicenames to a list of Rancid NetDevices.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            devicenames(list of strs): A list of device names</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">CommandWrapper</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">devicenames</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">rancid</span><span class="o">.</span><span class="n">Rancid</span><span class="p">(</span><span class="n">RANCID_ROOT</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">devicenames</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">devicelist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">devices</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">d</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="TriggerCommandWrapper"><a class="viewcode-back" href="../../eom.html#eom.do_poll.TriggerCommandWrapper">[docs]</a><span class="k">class</span> <span class="nc">TriggerCommandWrapper</span><span class="p">(</span><span class="n">CommandWrapper</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Subclass for issuing router commands using Trigger&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">devicenames</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;constructor.</span>
+<span class="sd">       </span>
+<span class="sd">        Initialize the TriggerCommandWrapper object. Also convert the</span>
+<span class="sd">        list of devices in devicenames to a list of NetDevices.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            devicenames(list of strs): A list of device names</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">CommandWrapper</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">devicenames</span><span class="p">)</span>
+        <span class="n">nd</span> <span class="o">=</span> <span class="n">netdevices</span><span class="o">.</span><span class="n">NetDevices</span><span class="p">(</span><span class="n">production_only</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">devicenames</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">devicelist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nd</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">d</span><span class="p">))</span>
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&quot;--device&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">&quot;append&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&quot;Device to lookup&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&quot;--mode&quot;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;trigger&#39;</span><span class="p">,</span> <span class="s">&#39;rancid&#39;</span><span class="p">],</span> <span class="n">default</span><span class="o">=</span><span class="s">&#39;trigger&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&quot;Mode of lookup&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&quot;--rancidroot&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">RANCID_ROOT</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&quot;Path to rancid root&quot;</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s">&#39;trigger&#39;</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">TriggerCommandWrapper</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">RancidCommandWrapper</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span>
+    <span class="k">print</span> <span class="n">r</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.4</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

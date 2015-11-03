@@ -1,0 +1,358 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>eom.rtr_poller &mdash; eom  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="eom  documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">eom  documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for eom.rtr_poller</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;Implementation of the router configuration fetcher for EOM.</span>
+
+<span class="sd">This module interfaces with routers in order to fetch routing related</span>
+<span class="sd">information. The received data is saved through the aggregator module to</span>
+<span class="sd">an internal data store.</span>
+
+<span class="sd">For parsing approach, see:</span>
+<span class="sd">http://stackoverflow.com/questions/30997205/pyparsing-parsing-ciscos-show-ip-bgp</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">rpki.rtr.channels</span> <span class="kn">import</span> <span class="n">Timestamp</span>
+<span class="kn">from</span> <span class="nn">eom.generic_poller</span> <span class="kn">import</span> <span class="n">EOMGenericPoller</span>
+<span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+<span class="kn">import</span> <span class="nn">netaddr</span>
+<span class="kn">import</span> <span class="nn">pipes</span>
+<span class="kn">from</span> <span class="nn">pyparsing</span> <span class="kn">import</span> <span class="n">col</span><span class="p">,</span><span class="n">Word</span><span class="p">,</span><span class="n">Optional</span><span class="p">,</span><span class="n">alphas</span><span class="p">,</span><span class="n">nums</span><span class="p">,</span>\
+                      <span class="n">ParseException</span><span class="p">,</span><span class="n">Combine</span><span class="p">,</span><span class="n">oneOf</span><span class="p">,</span><span class="n">Literal</span><span class="p">,</span>\
+                      <span class="n">Group</span><span class="p">,</span><span class="n">OneOrMore</span><span class="p">,</span><span class="n">ZeroOrMore</span><span class="p">,</span><span class="n">hexnums</span><span class="p">,</span><span class="n">Or</span>
+
+<div class="viewcode-block" id="RtrRIBState"><a class="viewcode-back" href="../../eom.html#eom.rtr_poller.RtrRIBState">[docs]</a><span class="k">class</span> <span class="nc">RtrRIBState</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A class that interfaces between router output data and the database&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sql</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sql: A handle to the sql database</span>
+<span class="sd">            device: the device identifier</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updated</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">pipes</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="n">device</span><span class="p">)</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span> <span class="o">=</span> <span class="n">sql</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rib_row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">define_grammar</span><span class="p">()</span>
+
+    <span class="c">#Format of sh ip bgp output:</span>
+    <span class="c">#</span>
+    <span class="c">#BGP table version is 0, local router ID is 192.168.56.101</span>
+    <span class="c">#Status codes: s suppressed, d damped, h history, * valid, &gt; best, i -</span>
+    <span class="c">#internal,</span>
+    <span class="c">#              r RIB-failure, S Stale, R Removed</span>
+    <span class="c">#Origin codes: i - IGP, e - EGP, ? - incomplete</span>
+    <span class="c">#</span>
+    <span class="c">#   Network          Next Hop            Metric LocPrf Weight Path</span>
+    <span class="c">#*&gt;i1.9.0.0/16       192.168.56.1            10      0      0 3257 4788 i</span>
+    <span class="c">#*&gt;i1.9.21.0/24      192.168.56.1                    0      0 7018 6453 4788 4788 i</span>
+    <span class="c">#</span>
+    <span class="c">#Total number of prefixes 2</span>
+    <span class="c">#</span>
+<div class="viewcode-block" id="RtrRIBState.define_grammar"><a class="viewcode-back" href="../../eom.html#eom.rtr_poller.RtrRIBState.define_grammar">[docs]</a>    <span class="k">def</span> <span class="nf">define_grammar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Define the grammar for the BGP output.</span>
+<span class="sd">    </span>
+<span class="sd">        See also:</span>
+<span class="sd">        http://stackoverflow.com/questions/30997205/pyparsing-parsing-ciscos-show-ip-bgp</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ip4Field</span> <span class="o">=</span> <span class="n">Word</span><span class="p">(</span><span class="n">nums</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">ip4Addr</span> <span class="o">=</span> <span class="n">Combine</span><span class="p">(</span><span class="n">ip4Field</span> <span class="o">+</span> <span class="s">&quot;.&quot;</span> <span class="o">+</span> <span class="n">ip4Field</span> <span class="o">+</span> <span class="s">&quot;.&quot;</span> <span class="o">+</span> <span class="n">ip4Field</span> <span class="o">+</span> <span class="s">&quot;.&quot;</span> <span class="o">+</span> <span class="n">ip4Field</span><span class="p">)</span>
+        <span class="n">hexint</span> <span class="o">=</span> <span class="n">Word</span><span class="p">(</span><span class="n">hexnums</span><span class="p">,</span><span class="n">exact</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">ip6Field</span> <span class="o">=</span> <span class="n">Or</span><span class="p">([</span><span class="n">hexint</span><span class="p">,</span> <span class="n">Literal</span><span class="p">(</span><span class="s">&quot;:&quot;</span><span class="p">)])</span>
+        <span class="n">ip6Addr</span> <span class="o">=</span> <span class="n">Combine</span><span class="p">(</span><span class="n">OneOrMore</span><span class="p">(</span><span class="n">ip6Field</span><span class="p">))</span>
+        <span class="n">ipAddr</span> <span class="o">=</span> <span class="n">Or</span><span class="p">([</span><span class="n">ip4Addr</span><span class="p">,</span> <span class="n">ip6Addr</span><span class="p">])</span>
+        <span class="n">status_code</span> <span class="o">=</span> <span class="n">Combine</span><span class="p">(</span><span class="n">Optional</span><span class="p">(</span><span class="n">oneOf</span><span class="p">(</span><span class="s">&quot;s d h * r&quot;</span><span class="p">))</span> <span class="o">+</span> <span class="n">Optional</span><span class="p">(</span><span class="n">Literal</span><span class="p">(</span><span class="s">&quot;&gt;&quot;</span><span class="p">))</span> <span class="o">+</span> <span class="n">Optional</span><span class="p">(</span><span class="n">Literal</span><span class="p">(</span><span class="s">&quot;i&quot;</span><span class="p">)))</span>
+        <span class="n">next_hop</span> <span class="o">=</span> <span class="n">ipAddr</span>
+        <span class="n">integer</span> <span class="o">=</span> <span class="n">Word</span><span class="p">(</span><span class="n">nums</span><span class="p">)</span><span class="o">.</span><span class="n">setParseAction</span><span class="p">(</span><span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span><span class="o">.</span><span class="n">setName</span><span class="p">(</span><span class="s">&quot;integer&quot;</span><span class="p">)</span>
+        <span class="n">metric</span> <span class="o">=</span> <span class="n">Optional</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tableValue</span><span class="p">(</span><span class="n">integer</span><span class="p">,</span> <span class="mi">41</span><span class="p">,</span> <span class="mi">46</span><span class="p">))</span>
+        <span class="n">locpref</span> <span class="o">=</span> <span class="n">Optional</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tableValue</span><span class="p">(</span><span class="n">integer</span><span class="p">,</span> <span class="mi">48</span><span class="p">,</span> <span class="mi">53</span><span class="p">))</span>
+        <span class="n">weight</span> <span class="o">=</span> <span class="n">Optional</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tableValue</span><span class="p">(</span><span class="n">integer</span><span class="p">,</span> <span class="mi">55</span><span class="p">,</span> <span class="mi">60</span><span class="p">))</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">Group</span><span class="p">(</span><span class="n">OneOrMore</span><span class="p">(</span><span class="n">Word</span><span class="p">(</span><span class="n">nums</span><span class="p">)))</span>
+        <span class="n">origin</span> <span class="o">=</span> <span class="n">oneOf</span><span class="p">(</span><span class="s">&quot;i e ?&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">status_code</span><span class="p">(</span><span class="s">&quot;status&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">ipAddr</span><span class="p">(</span><span class="s">&quot;pfx&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">Literal</span><span class="p">(</span><span class="s">&quot;/&quot;</span><span class="p">)</span> <span class="o">+</span> \
+            <span class="n">Word</span><span class="p">(</span><span class="n">nums</span><span class="p">,</span><span class="nb">max</span><span class="o">=</span><span class="mi">2</span><span class="p">)(</span><span class="s">&quot;pfxlen&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">ipAddr</span><span class="p">(</span><span class="s">&quot;nexthop&quot;</span><span class="p">)</span> <span class="o">+</span> \
+            <span class="n">metric</span><span class="p">(</span><span class="s">&quot;metric&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">locpref</span><span class="p">(</span><span class="s">&quot;locpref&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">weight</span><span class="p">(</span><span class="s">&quot;weight&quot;</span><span class="p">)</span> <span class="o">+</span> \
+            <span class="n">path</span><span class="p">(</span><span class="s">&quot;path&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">origin</span><span class="p">(</span><span class="s">&quot;route_orig&quot;</span><span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">_mustMatchCols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">startloc</span><span class="p">,</span><span class="n">endloc</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;specify constraint for particular field in output.</span>
+<span class="sd">    </span>
+<span class="sd">        See also:</span>
+<span class="sd">        http://stackoverflow.com/questions/30997205/pyparsing-parsing-ciscos-show-ip-bgp</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">pa</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">t</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">startloc</span> <span class="o">&lt;=</span> <span class="n">col</span><span class="p">(</span><span class="n">l</span><span class="p">,</span><span class="n">s</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">endloc</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ParseException</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="s">&quot;text not in expected columns&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pa</span>
+
+    <span class="k">def</span> <span class="nf">_tableValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">,</span> <span class="n">colstart</span><span class="p">,</span> <span class="n">colend</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;helper to define values in a space-delimited table</span>
+<span class="sd">    </span>
+<span class="sd">        See also:</span>
+<span class="sd">        http://stackoverflow.com/questions/30997205/pyparsing-parsing-ciscos-show-ip-bgp</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">expr</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">addParseAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mustMatchCols</span><span class="p">(</span><span class="n">colstart</span><span class="p">,</span><span class="n">colend</span><span class="p">))</span>
+
+<div class="viewcode-block" id="RtrRIBState.parse"><a class="viewcode-back" href="../../eom.html#eom.rtr_poller.RtrRIBState.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parse the router RIB dump</span>
+<span class="sd">    </span>
+<span class="sd">        Args:</span>
+<span class="sd">            output: The output generated by do_poll.py</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A dict containing parsed RIB entries</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">output</span><span class="p">:</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">j</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">results</span>
+            <span class="n">ribdump</span> <span class="o">=</span> <span class="n">j</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">][</span><span class="s">&quot;show ip bgp&quot;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">ribdump</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rib_row</span><span class="o">.</span><span class="n">parseString</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+                    <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">ParseException</span><span class="p">:</span>
+                    <span class="c"># Ignore lines we cannot parse</span>
+                    <span class="k">pass</span>
+        <span class="k">return</span> <span class="n">results</span>
+</div>
+<div class="viewcode-block" id="RtrRIBState.get_ip_str"><a class="viewcode-back" href="../../eom.html#eom.rtr_poller.RtrRIBState.get_ip_str">[docs]</a>    <span class="k">def</span> <span class="nf">get_ip_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ipint</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert an IP int to an ordinal IP string.</span>
+
+<span class="sd">        Convert the IP int first to its dotted or string form. Then</span>
+<span class="sd">        expand each component so that determining ranges between two of</span>
+<span class="sd">        these strings becomes possible.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ipint: int value of an IP address</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Expanded string representation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ipaddr</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">ipobj</span> <span class="o">=</span> <span class="n">netaddr</span><span class="o">.</span><span class="n">IPAddress</span><span class="p">(</span><span class="n">ipint</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ipobj</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+            <span class="n">ipaddr</span> <span class="o">=</span> <span class="n">ipobj</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">netaddr</span><span class="o">.</span><span class="n">ipv6_verbose</span><span class="p">)</span>
+            <span class="n">ipaddr</span> <span class="o">=</span> <span class="n">ipaddr</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dotted</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ipobj</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)</span>
+            <span class="n">ipaddr</span> <span class="o">=</span> <span class="s">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">dotted</span> <span class="p">])</span>
+        <span class="k">return</span> <span class="n">ipaddr</span>
+</div>
+<div class="viewcode-block" id="RtrRIBState.store_in_db"><a class="viewcode-back" href="../../eom.html#eom.rtr_poller.RtrRIBState.store_in_db">[docs]</a>    <span class="k">def</span> <span class="nf">store_in_db</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rib</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Store the given RIB data into the database.</span>
+
+<span class="sd">        Updating the database involves two steps. First is to make sure</span>
+<span class="sd">        that old entries are deleted and then to add each RIB entry into</span>
+<span class="sd">        its own row indexed by the router id.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rib: A dict containing parsed RIB information</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">rib</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;Updating Database with new data.&quot;</span>
+            <span class="c">#pprint(rib)</span>
+            <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+            <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;SELECT rtr_id, device FROM rtr_cache WHERE device = ?&quot;</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="p">))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">rtr_id</span><span class="p">,</span> <span class="n">device</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+                <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;DELETE FROM rtr_cache WHERE device = ?&quot;</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="p">))</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span> <span class="c"># Simulate lookup failure case</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;INSERT INTO rtr_cache (device) VALUES (?)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,))</span>
+                <span class="n">rtr_id</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">lastrowid</span>
+            <span class="c"># Update RIB info</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rib</span><span class="p">:</span>
+                <span class="c"># Split path into pathbutone and orig_asn</span>
+                <span class="n">pathbutone</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">path</span>
+                <span class="n">orig_asn</span> <span class="o">=</span> <span class="n">pathbutone</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="n">pathbutonestr</span> <span class="o">=</span> <span class="s">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pathbutone</span><span class="p">)</span>
+                <span class="n">ipstr</span> <span class="o">=</span> <span class="nb">unicode</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">pfx</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot;/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">pfxlen</span><span class="p">),</span> <span class="s">&quot;utf-8&quot;</span><span class="p">)</span>
+                <span class="n">prefixint_min</span> <span class="o">=</span> <span class="n">netaddr</span><span class="o">.</span><span class="n">IPNetwork</span><span class="p">(</span><span class="n">ipstr</span><span class="p">)</span><span class="o">.</span><span class="n">first</span>
+                <span class="n">prefixint_max</span> <span class="o">=</span> <span class="n">netaddr</span><span class="o">.</span><span class="n">IPNetwork</span><span class="p">(</span><span class="n">ipstr</span><span class="p">)</span><span class="o">.</span><span class="n">last</span>
+                <span class="n">values</span> <span class="o">=</span> <span class="p">(</span><span class="n">rtr_id</span><span class="p">,</span> 
+                          <span class="n">idx</span><span class="p">,</span>
+                          <span class="n">r</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> 
+                          <span class="n">r</span><span class="o">.</span><span class="n">pfx</span><span class="p">,</span> 
+                          <span class="nb">int</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">pfxlen</span><span class="p">),</span> 
+                          <span class="bp">self</span><span class="o">.</span><span class="n">get_ip_str</span><span class="p">(</span><span class="n">prefixint_min</span><span class="p">),</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">get_ip_str</span><span class="p">(</span><span class="n">prefixint_max</span><span class="p">),</span>
+                          <span class="n">r</span><span class="o">.</span><span class="n">nexthop</span><span class="p">,</span> 
+                          <span class="nb">int</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">metric</span><span class="p">)</span> <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">metric</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span> 
+                          <span class="nb">int</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">locpref</span><span class="p">)</span> <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">locpref</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span> 
+                          <span class="nb">int</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">weight</span><span class="p">)</span> <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">weight</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span> 
+                          <span class="n">pathbutonestr</span><span class="p">,</span> 
+                          <span class="nb">int</span><span class="p">(</span><span class="n">orig_asn</span><span class="p">),</span> 
+                          <span class="n">r</span><span class="o">.</span><span class="n">route_orig</span><span class="p">)</span>
+                <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;INSERT INTO rtr_rib (rtr_id, idx, status, &quot;</span>
+                            <span class="s">&quot;pfx, pfxlen, pfxstr_min, pfxstr_max, nexthop, &quot;</span>
+                            <span class="s">&quot;metric, locpref, weight, pathbutone, orig_asn, route_orig) &quot;</span>
+                            <span class="s">&quot;VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)&quot;</span><span class="p">,</span>
+                            <span class="n">values</span><span class="p">)</span>
+                <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="RtrRIBState.update"><a class="viewcode-back" href="../../eom.html#eom.rtr_poller.RtrRIBState.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parse output and store results to database.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            output: The output generated by do_poll.py</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A dict containing parsed RIB entries</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ribinfo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ribinfo</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">store_in_db</span><span class="p">(</span><span class="n">ribinfo</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="EOMRtrRIBFetcher"><a class="viewcode-back" href="../../eom.html#eom.rtr_poller.EOMRtrRIBFetcher">[docs]</a><span class="k">class</span> <span class="nc">EOMRtrRIBFetcher</span><span class="p">(</span><span class="n">EOMGenericPoller</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Poller for fetching RIB information from a router instance.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">aggregator</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Instantiate the router status fetcher object.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            device(Str): Device identifier</span>
+<span class="sd">            aggregator(EOMAggregator): The data aggregator object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">aggregator</span> <span class="o">!=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">pipes</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">reset_session</span><span class="p">:</span>
+            <span class="n">aggregator</span><span class="o">.</span><span class="n">reset_rtr_rib_session</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span> <span class="o">=</span> <span class="n">aggregator</span><span class="o">.</span><span class="n">get_sql_connection</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">poll_interval</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">poll_interval</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ribstate</span> <span class="o">=</span> <span class="n">RtrRIBState</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_update</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ribstate</span><span class="o">.</span><span class="n">updated</span>
+
+<div class="viewcode-block" id="EOMRtrRIBFetcher.cleanup"><a class="viewcode-back" href="../../eom.html#eom.rtr_poller.EOMRtrRIBFetcher.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="EOMRtrRIBFetcher.poll"><a class="viewcode-back" href="../../eom.html#eom.rtr_poller.EOMRtrRIBFetcher.poll">[docs]</a>    <span class="k">def</span> <span class="nf">poll</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">now</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetch data from configured routers.</span>
+
+<span class="sd">        Process the fetch queue to identfy fetch events that must be</span>
+<span class="sd">        processed during this time interval. Store all data received</span>
+<span class="sd">        to the internal data store through the aggregator module.</span>
+
+<span class="sd">        The data is fetched using the do_poll.py script run as a</span>
+<span class="sd">        sub-process. This is not optimal, but we are constrained by the</span>
+<span class="sd">        fact that the Trigger module, which pulls data from the router</span>
+<span class="sd">        and the rpki-rtr implementation which pulls data from a rpki-rtr</span>
+<span class="sd">        manager instance use different event loops. In the future, it</span>
+<span class="sd">        would probably make sense to modify the rpki-rtr implementation</span>
+<span class="sd">        to use the Python twisted framework.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            now: current timestamp</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (Boolean, int): A tuple comprising of a pending status and</span>
+<span class="sd">                            the timestamp for the next event in the queue.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">now</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_update</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">poll_interval</span><span class="p">:</span>
+            <span class="c"># Start a fresh lookup</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="s">&quot;python&quot;</span><span class="p">,</span> <span class="s">&quot;-W ignore&quot;</span><span class="p">,</span> <span class="s">&quot;do_poll.py&quot;</span><span class="p">,</span> <span class="s">&quot;--device&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">])</span>
+            <span class="c">#output = subprocess.check_output([&quot;clogin&quot;, &quot;-c &#39;show ip bgp&#39;&quot;, self.device])</span>
+            <span class="c">#output = str(&#39;{&quot;quagga.vm&quot;: {&quot;show ip bgp&quot;: &quot;BGP table version is 0, local router ID is 192.168.56.101\\r\\nStatus codes: s suppressed, d damped, h history, * valid, &gt; best, i - internal,\\r\\n              r RIB-failure, S Stale, R Removed\\r\\nOrigin codes: i - IGP, e - EGP, ? - incomplete\\r\\n\\r\\n   Network          Next Hop            Metric LocPrf Weight Path\\r\\n*&gt;i1.9.0.0/16       192.168.56.1            10      0      0 3257 4788 i\\r\\n*&gt;i1.9.21.0/24      192.168.56.1                    0      0 7018 6453 4788 4788 i\\r\\n\\r\\nTotal number of prefixes 2\\r\\n&quot;}}&#39;)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ribstate</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">last_update</span> <span class="o">=</span> <span class="n">Timestamp</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+        <span class="c"># Since we&#39;re doing the lookup as a sub-process we&#39;re never</span>
+        <span class="c"># waiting for data. So the pending status is always false.</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">False</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_update</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">poll_interval</span><span class="p">)</span>
+</pre></div></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.4</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

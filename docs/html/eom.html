@@ -1,0 +1,629 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>eom package &mdash; eom  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="eom  documentation" href="index.html" />
+    <link rel="prev" title="Welcome to eom’s documentation!" href="index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to eom’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">eom  documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="eom-package">
+<h1>eom package<a class="headerlink" href="#eom-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-eom.aggregator">
+<span id="eom-aggregator-module"></span><h2>eom.aggregator module<a class="headerlink" href="#module-eom.aggregator" title="Permalink to this headline">¶</a></h2>
+<p>Implementation of the data aggregation module for EOM.</p>
+<p>This module interfaces with various fetcher modules and stores the
+retrieved data into a persistent data store (database).</p>
+<dl class="class">
+<dt id="eom.aggregator.EOMAggregator">
+<em class="property">class </em><code class="descclassname">eom.aggregator.</code><code class="descname">EOMAggregator</code><span class="sig-paren">(</span><em>dbfile='eom_default_db.sqlite'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/aggregator.html#EOMAggregator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.aggregator.EOMAggregator" title="Permalink to this definition">¶</a></dt>
+<dd><p>A RPKI-Rtr and RIB data aggregator.</p>
+<dl class="method">
+<dt id="eom.aggregator.EOMAggregator.get_covering">
+<code class="descname">get_covering</code><span class="sig-paren">(</span><em>rtr_id</em>, <em>pfxstr_min</em>, <em>pfxstr_max</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/aggregator.html#EOMAggregator.get_covering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.aggregator.EOMAggregator.get_covering" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch route entries that cover a given prefix range.</p>
+<p>Select those routes whose advertised address range covers the
+given prefix range.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd>rtr_id(string): the router id
+pfxstr_min(string): the lower value in the prefix range
+pfxstr_max(string): the upper value in the prefix range</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="eom.aggregator.EOMAggregator.get_rpki_rib">
+<code class="descname">get_rpki_rib</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/aggregator.html#EOMAggregator.get_rpki_rib"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.aggregator.EOMAggregator.get_rpki_rib" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch rib information in conjunction with rpki information.</p>
+<p>Construct a database &#8216;join&#8217; of the contents of currently available
+rpki-rtr information with currently available RIB information.
+The join is constructed over matching prefix ranges; that is,
+for cases where the rpki rtr ROA covers the route prefix in the
+RIB.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd>None</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="eom.aggregator.EOMAggregator.get_sql_connection">
+<code class="descname">get_sql_connection</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/aggregator.html#EOMAggregator.get_sql_connection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.aggregator.EOMAggregator.get_sql_connection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an instance to the sql connection object.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>None</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="eom.aggregator.EOMAggregator.init_rib_tables">
+<code class="descname">init_rib_tables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/aggregator.html#EOMAggregator.init_rib_tables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.aggregator.EOMAggregator.init_rib_tables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize RIB database tables.</p>
+<p>Two tables are created. One stores the rtr ID associated with a
+given device that is to be queried, while the second stores
+different route attributes gleaned from &#8216;sh ip bgp&#8217; command.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>None</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="eom.aggregator.EOMAggregator.init_rpki_rtr_tables">
+<code class="descname">init_rpki_rtr_tables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/aggregator.html#EOMAggregator.init_rpki_rtr_tables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.aggregator.EOMAggregator.init_rpki_rtr_tables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize rpki-rtr database tables.</p>
+<p>Three tables are created - one that keeps track of the rpki-rtr
+session, one that keeps track of the prefixes associated with
+each active rpki-rtr session, and finally one for storing router
+key information.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>None</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="eom.aggregator.EOMAggregator.reset_rpki_rtr_session">
+<code class="descname">reset_rpki_rtr_session</code><span class="sig-paren">(</span><em>host</em>, <em>port</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/aggregator.html#EOMAggregator.reset_rpki_rtr_session"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.aggregator.EOMAggregator.reset_rpki_rtr_session" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset an existing rpki-rtr session.</p>
+<p>Reset any existing rpki-rtr session for the given host and
+port.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd>host (string): the rpki-rtr server host 
+port (string): the rpki-rtr server port</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="eom.aggregator.EOMAggregator.reset_rtr_rib_session">
+<code class="descname">reset_rtr_rib_session</code><span class="sig-paren">(</span><em>device</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/aggregator.html#EOMAggregator.reset_rtr_rib_session"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.aggregator.EOMAggregator.reset_rtr_rib_session" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset a RIB query session.</p>
+<p>Delete any state corresponding to a RIB query that was issued
+for a particular router device.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd>device(string): The device identifier.</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-eom.analyzer">
+<span id="eom-analyzer-module"></span><h2>eom.analyzer module<a class="headerlink" href="#module-eom.analyzer" title="Permalink to this headline">¶</a></h2>
+<p>Implementation of the analyzer module for EOM.</p>
+<p>This module controls most of the EOM tool&#8217;s operation. It accepts
+preferences from the user, translates that data to configuration
+parameters for the various modules, uses an internal scheduler to invoke
+the fetch routines for various fetcher modules, extracts pertinent
+streams of data from the aggregator module and other data stores, and
+feeds such data to data analysis modules for further processing and
+report generation.</p>
+<dl class="class">
+<dt id="eom.analyzer.EOMAnalyzer">
+<em class="property">class </em><code class="descclassname">eom.analyzer.</code><code class="descname">EOMAnalyzer</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/analyzer.html#EOMAnalyzer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.analyzer.EOMAnalyzer" title="Permalink to this definition">¶</a></dt>
+<dd><p>The analyzer module for EOM.</p>
+<dl class="method">
+<dt id="eom.analyzer.EOMAnalyzer.add_rpkirtr_fetcher">
+<code class="descname">add_rpkirtr_fetcher</code><span class="sig-paren">(</span><em>rpkirtr_args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/analyzer.html#EOMAnalyzer.add_rpkirtr_fetcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.analyzer.EOMAnalyzer.add_rpkirtr_fetcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a new rpkirtr poller instance.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>rpkirtr_args: Arguments for the EOMRPKIRtrCli instance.</dd>
+<dt>Returns:</dt>
+<dd>None</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="eom.analyzer.EOMAnalyzer.add_rtr_rib_fetcher">
+<code class="descname">add_rtr_rib_fetcher</code><span class="sig-paren">(</span><em>rtrrib_args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/analyzer.html#EOMAnalyzer.add_rtr_rib_fetcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.analyzer.EOMAnalyzer.add_rtr_rib_fetcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a new rtr_rib poller instance.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>rtrrib_args: Arguments for the EOMRtrRIBFetcher instance.</dd>
+<dt>Returns:</dt>
+<dd>None</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="eom.analyzer.EOMAnalyzer.analyze">
+<code class="descname">analyze</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/analyzer.html#EOMAnalyzer.analyze"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.analyzer.EOMAnalyzer.analyze" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract data from database and analyze.</p>
+<p>Get the list of RIB entries and associated RPKI information to
+be analyzed from the aggregator. Identify valid, invalid and
+unknown prefixes and finally display the output through the 
+EOMReporter module.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>None</dd>
+<dt>Returns:</dt>
+<dd>None</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="eom.analyzer.EOMAnalyzer.default_timeout">
+<code class="descname">default_timeout</code><em class="property"> = 30</em><a class="headerlink" href="#eom.analyzer.EOMAnalyzer.default_timeout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="eom.analyzer.EOMAnalyzer.process_fetchers">
+<code class="descname">process_fetchers</code><span class="sig-paren">(</span><em>now</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/analyzer.html#EOMAnalyzer.process_fetchers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.analyzer.EOMAnalyzer.process_fetchers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process list of pollers and fetch data.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>now: current timestamp</dd>
+<dt>Returns:</dt>
+<dd>A tuple containing the number of pending pollers and the
+earliest wakeup time. If there are no pollers in the queue,
+then both elements in the list are -1.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="eom.analyzer.EOMAnalyzer.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/analyzer.html#EOMAnalyzer.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.analyzer.EOMAnalyzer.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Kick off the analyzer process loop.</p>
+<p>Process all pollers, once we have all data run the analysis
+routine and repeat the loop.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>None</dd>
+<dt>Returns:</dt>
+<dd>None</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="eom.analyzer.eom_parse_args">
+<code class="descclassname">eom.analyzer.</code><code class="descname">eom_parse_args</code><span class="sig-paren">(</span><em>desc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/analyzer.html#eom_parse_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.analyzer.eom_parse_args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="eom.analyzer.rpki_server_spec">
+<code class="descclassname">eom.analyzer.</code><code class="descname">rpki_server_spec</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/analyzer.html#rpki_server_spec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.analyzer.rpki_server_spec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define the format for the rpki-server spec argument</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="eom.analyzer.rtr_rib_spec">
+<code class="descclassname">eom.analyzer.</code><code class="descname">rtr_rib_spec</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/analyzer.html#rtr_rib_spec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.analyzer.rtr_rib_spec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define the format for the rtr-rib spec argument</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-eom.do_poll">
+<span id="eom-do-poll-module"></span><h2>eom.do_poll module<a class="headerlink" href="#module-eom.do_poll" title="Permalink to this headline">¶</a></h2>
+<p>Fetch RIB information from routers.</p>
+<p>This scripts queries the given device for its RIB information using the
+&#8216;sh ip bgp&#8217; command. The script assumes that one of either Trigger or
+RANCID has been configured in order to enable the router to authenticate
+the issuance of such commands from the querying machine.</p>
+<p>NOTE: That RANCID support appears to be not fully supported in Trigger,
+so this does not seem to work properly at the moment.</p>
+<p>The output is returned as a JSON representation of a dict structure,
+indexed on the device name and the command run.</p>
+<dl class="class">
+<dt id="eom.do_poll.CommandWrapper">
+<em class="property">class </em><code class="descclassname">eom.do_poll.</code><code class="descname">CommandWrapper</code><span class="sig-paren">(</span><em>devicenames</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/do_poll.html#CommandWrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.do_poll.CommandWrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generic Command Wrapper Class.</p>
+<p>Allows us to poll the attached net devices for BGP information. 
+Note that this class must not be instantiated directly.</p>
+<dl class="method">
+<dt id="eom.do_poll.CommandWrapper.poll">
+<code class="descname">poll</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/do_poll.html#CommandWrapper.poll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.do_poll.CommandWrapper.poll" title="Permalink to this definition">¶</a></dt>
+<dd><p>Poll device list for BGP RIB information.</p>
+<p>Poll all the NetDevices that are associated with this object and
+query them for BGP RIB information using &#8216;sh ip bgp&#8217;. The
+results are returned as a JSON string.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>None.</dd>
+<dt>Returns:</dt>
+<dd>str: A JSON string representation of the results</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="eom.do_poll.RancidCommandWrapper">
+<em class="property">class </em><code class="descclassname">eom.do_poll.</code><code class="descname">RancidCommandWrapper</code><span class="sig-paren">(</span><em>devicenames</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/do_poll.html#RancidCommandWrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.do_poll.RancidCommandWrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#eom.do_poll.CommandWrapper" title="eom.do_poll.CommandWrapper"><code class="xref py py-class docutils literal"><span class="pre">eom.do_poll.CommandWrapper</span></code></a></p>
+<p>Subclass for issuing router commands using RANCID</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="eom.do_poll.TriggerCommandWrapper">
+<em class="property">class </em><code class="descclassname">eom.do_poll.</code><code class="descname">TriggerCommandWrapper</code><span class="sig-paren">(</span><em>devicenames</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/do_poll.html#TriggerCommandWrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.do_poll.TriggerCommandWrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#eom.do_poll.CommandWrapper" title="eom.do_poll.CommandWrapper"><code class="xref py py-class docutils literal"><span class="pre">eom.do_poll.CommandWrapper</span></code></a></p>
+<p>Subclass for issuing router commands using Trigger</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-eom.generic_poller">
+<span id="eom-generic-poller-module"></span><h2>eom.generic_poller module<a class="headerlink" href="#module-eom.generic_poller" title="Permalink to this headline">¶</a></h2>
+<p>Implementation of a generic poller.</p>
+<p>This module implements an abstract class that serves as the base class
+for all poller modules. This includes an event queue that keeps track of
+events that are to be processed during the current time instance
+and the maintenance of the event log associated with all poll
+operations.</p>
+<dl class="class">
+<dt id="eom.generic_poller.EOMGenericPoller">
+<em class="property">class </em><code class="descclassname">eom.generic_poller.</code><code class="descname">EOMGenericPoller</code><span class="sig-paren">(</span><em>conf</em>, <em>aggregator</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/generic_poller.html#EOMGenericPoller"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.generic_poller.EOMGenericPoller" title="Permalink to this definition">¶</a></dt>
+<dd><p>A generic poller</p>
+<dl class="method">
+<dt id="eom.generic_poller.EOMGenericPoller.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/generic_poller.html#EOMGenericPoller.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.generic_poller.EOMGenericPoller.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean up at exit time.</p>
+<p>This method must be overridden by sub-classes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="eom.generic_poller.EOMGenericPoller.poll">
+<code class="descname">poll</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/generic_poller.html#EOMGenericPoller.poll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.generic_poller.EOMGenericPoller.poll" title="Permalink to this definition">¶</a></dt>
+<dd><p>poll the associated device</p>
+<p>This method must be overridden by sub-classes.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-eom.reporter">
+<span id="eom-reporter-module"></span><h2>eom.reporter module<a class="headerlink" href="#module-eom.reporter" title="Permalink to this headline">¶</a></h2>
+<p>Implementation of generic reporter module for EOM.</p>
+<p>This module implements a generic reporter module that interfaces with
+the User Interface (currently stdout).</p>
+<dl class="class">
+<dt id="eom.reporter.EOMReporter">
+<em class="property">class </em><code class="descclassname">eom.reporter.</code><code class="descname">EOMReporter</code><a class="reference internal" href="_modules/eom/reporter.html#EOMReporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.reporter.EOMReporter" title="Permalink to this definition">¶</a></dt>
+<dd><p>A generic reporter module</p>
+<dl class="method">
+<dt id="eom.reporter.EOMReporter.get_rib_display_str">
+<code class="descname">get_rib_display_str</code><span class="sig-paren">(</span><em>rib_tup</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/reporter.html#EOMReporter.get_rib_display_str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.reporter.EOMReporter.get_rib_display_str" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a string representation for the RIB tuple</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>rib_tuple: A tuple containing RIB information</dd>
+<dt>Returns:</dt>
+<dd>A string representation for the tuple.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="eom.reporter.EOMReporter.show">
+<code class="descname">show</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/reporter.html#EOMReporter.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.reporter.EOMReporter.show" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display data onto the User Interface</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>data(dict): An object containing particulars of the data to</dt>
+<dd>be displayed.</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd>status(boolean): True if success; False if failure.</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-eom.rpki_rtr_cli">
+<span id="eom-rpki-rtr-cli-module"></span><h2>eom.rpki_rtr_cli module<a class="headerlink" href="#module-eom.rpki_rtr_cli" title="Permalink to this headline">¶</a></h2>
+<p>Implementation of the rpki-rtr client function for EOM.</p>
+<p>This module interfaces with a rpki-rtr server component to retrieve
+validated RPKI information for use by routers. The received data is
+saved through the aggregator module to an internal data store.</p>
+<dl class="class">
+<dt id="eom.rpki_rtr_cli.EOMRPKIRtrCli">
+<em class="property">class </em><code class="descclassname">eom.rpki_rtr_cli.</code><code class="descname">EOMRPKIRtrCli</code><span class="sig-paren">(</span><em>args</em>, <em>aggregator</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/rpki_rtr_cli.html#EOMRPKIRtrCli"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.rpki_rtr_cli.EOMRPKIRtrCli" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#eom.generic_poller.EOMGenericPoller" title="eom.generic_poller.EOMGenericPoller"><code class="xref py py-class docutils literal"><span class="pre">eom.generic_poller.EOMGenericPoller</span></code></a></p>
+<p>Poller for fetching RPKI prefix information from an RPKI-Rtr Manager instance</p>
+<dl class="method">
+<dt id="eom.rpki_rtr_cli.EOMRPKIRtrCli.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/rpki_rtr_cli.html#EOMRPKIRtrCli.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.rpki_rtr_cli.EOMRPKIRtrCli.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clean up the client object associated with the poller.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>None</dd>
+<dt>Returns:</dt>
+<dd>None</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="eom.rpki_rtr_cli.EOMRPKIRtrCli.poll">
+<code class="descname">poll</code><span class="sig-paren">(</span><em>now</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/rpki_rtr_cli.html#EOMRPKIRtrCli.poll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.rpki_rtr_cli.EOMRPKIRtrCli.poll" title="Permalink to this definition">¶</a></dt>
+<dd><p>Poll data from configured RPKI-rtr server instances.</p>
+<p>Process the queue to identfy events that must be processed
+during this time interval.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>now: current timestamp</dd>
+<dt>Returns:</dt>
+<dd><dl class="first last docutils">
+<dt>(Boolean, int): A tuple comprising of a pending status and</dt>
+<dd>the timestamp for the next event in the queue.</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-eom.rtr_poller">
+<span id="eom-rtr-poller-module"></span><h2>eom.rtr_poller module<a class="headerlink" href="#module-eom.rtr_poller" title="Permalink to this headline">¶</a></h2>
+<p>Implementation of the router configuration fetcher for EOM.</p>
+<p>This module interfaces with routers in order to fetch routing related
+information. The received data is saved through the aggregator module to
+an internal data store.</p>
+<p>For parsing approach, see:
+<a class="reference external" href="http://stackoverflow.com/questions/30997205/pyparsing-parsing-ciscos-show-ip-bgp">http://stackoverflow.com/questions/30997205/pyparsing-parsing-ciscos-show-ip-bgp</a></p>
+<dl class="class">
+<dt id="eom.rtr_poller.EOMRtrRIBFetcher">
+<em class="property">class </em><code class="descclassname">eom.rtr_poller.</code><code class="descname">EOMRtrRIBFetcher</code><span class="sig-paren">(</span><em>args</em>, <em>aggregator</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/rtr_poller.html#EOMRtrRIBFetcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.rtr_poller.EOMRtrRIBFetcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#eom.generic_poller.EOMGenericPoller" title="eom.generic_poller.EOMGenericPoller"><code class="xref py py-class docutils literal"><span class="pre">eom.generic_poller.EOMGenericPoller</span></code></a></p>
+<p>Poller for fetching RIB information from a router instance.</p>
+<dl class="method">
+<dt id="eom.rtr_poller.EOMRtrRIBFetcher.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/rtr_poller.html#EOMRtrRIBFetcher.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.rtr_poller.EOMRtrRIBFetcher.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="eom.rtr_poller.EOMRtrRIBFetcher.poll">
+<code class="descname">poll</code><span class="sig-paren">(</span><em>now</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/rtr_poller.html#EOMRtrRIBFetcher.poll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.rtr_poller.EOMRtrRIBFetcher.poll" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch data from configured routers.</p>
+<p>Process the fetch queue to identfy fetch events that must be
+processed during this time interval. Store all data received
+to the internal data store through the aggregator module.</p>
+<p>The data is fetched using the do_poll.py script run as a
+sub-process. This is not optimal, but we are constrained by the
+fact that the Trigger module, which pulls data from the router
+and the rpki-rtr implementation which pulls data from a rpki-rtr
+manager instance use different event loops. In the future, it
+would probably make sense to modify the rpki-rtr implementation
+to use the Python twisted framework.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>now: current timestamp</dd>
+<dt>Returns:</dt>
+<dd><dl class="first last docutils">
+<dt>(Boolean, int): A tuple comprising of a pending status and</dt>
+<dd>the timestamp for the next event in the queue.</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="eom.rtr_poller.RtrRIBState">
+<em class="property">class </em><code class="descclassname">eom.rtr_poller.</code><code class="descname">RtrRIBState</code><span class="sig-paren">(</span><em>sql</em>, <em>device</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/rtr_poller.html#RtrRIBState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.rtr_poller.RtrRIBState" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class that interfaces between router output data and the database</p>
+<dl class="method">
+<dt id="eom.rtr_poller.RtrRIBState.define_grammar">
+<code class="descname">define_grammar</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/rtr_poller.html#RtrRIBState.define_grammar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.rtr_poller.RtrRIBState.define_grammar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define the grammar for the BGP output.</p>
+<p>See also:
+<a class="reference external" href="http://stackoverflow.com/questions/30997205/pyparsing-parsing-ciscos-show-ip-bgp">http://stackoverflow.com/questions/30997205/pyparsing-parsing-ciscos-show-ip-bgp</a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="eom.rtr_poller.RtrRIBState.get_ip_str">
+<code class="descname">get_ip_str</code><span class="sig-paren">(</span><em>ipint</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/rtr_poller.html#RtrRIBState.get_ip_str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.rtr_poller.RtrRIBState.get_ip_str" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert an IP int to an ordinal IP string.</p>
+<p>Convert the IP int first to its dotted or string form. Then
+expand each component so that determining ranges between two of
+these strings becomes possible.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>ipint: int value of an IP address</dd>
+<dt>Returns:</dt>
+<dd>Expanded string representation.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="eom.rtr_poller.RtrRIBState.parse">
+<code class="descname">parse</code><span class="sig-paren">(</span><em>output</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/rtr_poller.html#RtrRIBState.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.rtr_poller.RtrRIBState.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse the router RIB dump</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>output: The output generated by do_poll.py</dd>
+<dt>Returns:</dt>
+<dd>A dict containing parsed RIB entries</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="eom.rtr_poller.RtrRIBState.store_in_db">
+<code class="descname">store_in_db</code><span class="sig-paren">(</span><em>rib</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/rtr_poller.html#RtrRIBState.store_in_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.rtr_poller.RtrRIBState.store_in_db" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store the given RIB data into the database.</p>
+<p>Updating the database involves two steps. First is to make sure
+that old entries are deleted and then to add each RIB entry into
+its own row indexed by the router id.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>rib: A dict containing parsed RIB information</dd>
+<dt>Returns:</dt>
+<dd>None</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="eom.rtr_poller.RtrRIBState.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>output</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/rtr_poller.html#RtrRIBState.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.rtr_poller.RtrRIBState.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse output and store results to database.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>output: The output generated by do_poll.py</dd>
+<dt>Returns:</dt>
+<dd>A dict containing parsed RIB entries</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-eom">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-eom" title="Permalink to this headline">¶</a></h2>
+<p>This package contains scripts that enables an operator to assess the
+impact of RPKI validation on routing.</p>
+<p>This package exports the following classes:</p>
+<p>EOMAggregator: A RPKI-Rtr and RIB data aggregator.
+EOMAnalyzer: The analyzer module for EOM
+EOMGenericPoller: A generic poller
+EOMRPKIRtrCli: Poller for fetching RPKI prefix information from an RPKI-Rtr Manager instance
+EOMRtrRIBFetcher: Poller for fetching RIB information from a router instance.
+EOMReporter: A generic reporter module</p>
+<p>CommandWrapper: Generic Command Wrapper Class
+RancidCommandWrapper: Subclass for issuing router commands using RANCID
+TriggerCommandWrapper: Subclass for issuing router commands using Trigger</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">eom package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-eom.aggregator">eom.aggregator module</a></li>
+<li><a class="reference internal" href="#module-eom.analyzer">eom.analyzer module</a></li>
+<li><a class="reference internal" href="#module-eom.do_poll">eom.do_poll module</a></li>
+<li><a class="reference internal" href="#module-eom.generic_poller">eom.generic_poller module</a></li>
+<li><a class="reference internal" href="#module-eom.reporter">eom.reporter module</a></li>
+<li><a class="reference internal" href="#module-eom.rpki_rtr_cli">eom.rpki_rtr_cli module</a></li>
+<li><a class="reference internal" href="#module-eom.rtr_poller">eom.rtr_poller module</a></li>
+<li><a class="reference internal" href="#module-eom">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to eom&#8217;s documentation!</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/eom.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.4</a>
+      
+      |
+      <a href="_sources/eom.txt"
+          rel="nofollow">Page source</a></li>
+    </div>
+
+    
+
+    
+  </body>
+</html>
