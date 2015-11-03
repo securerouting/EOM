@@ -1,0 +1,4 @@
+include LICENSE README 
+recursive-include eom *.py
+recursive-include docs *
+prune docs_src

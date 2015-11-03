@@ -1,0 +1,63 @@
+#!/usr/bin/env python
+
+"""
+EOM Tool
+"""
+
+import os
+import sys
+import time
+import logging
+import logging.handlers
+import argparse
+
+from eom.analyzer import eom_parse_args, EOMAnalyzer
+
+class Formatter(logging.Formatter):
+
+    converter = time.gmtime
+
+    def __init__(self, debug, fmt, datefmt):
+        self.debug = debug
+        super(Formatter, self).__init__(fmt, datefmt)
+
+    def format(self, record):
+        if getattr(record, "connection", None) is None:
+            record.connection = ""
+        return super(Formatter, self).format(record)
+
+    def formatException(self, ei):
+        if self.debug:
+            return super(Formatter, self).formatException(ei)
+        else:
+            return str(ei[1])
+
+
+def setup_logging(args):
+    fmt = "rpki-rtr" + "%(connection)s[%(process)d] %(message)s"
+
+    if args.log_to == "stderr":
+        handler = logging.StreamHandler()
+        fmt = "%(asctime)s " + fmt
+    elif os.path.exists("/dev/log"):
+        handler = logging.handlers.SysLogHandler("/dev/log")
+    else:
+        handler = logging.handlers.SysLogHandler()
+
+    handler.setFormatter(Formatter(args.debug, fmt, "%Y-%m-%dT%H:%M:%SZ"))
+    logging.root.addHandler(handler)
+    logging.root.setLevel(int(getattr(logging, args.log_level.upper())))
+
+
+def main():
+    os.environ["TZ"] = "UTC"
+    time.tzset()
+    parser = eom_parse_args(__doc__)
+    args = parser.parse_args()
+#    setup_logging(args)
+    analyzer = EOMAnalyzer(args)
+    analyzer.run() 
+
+
+if __name__ == "__main__":
+  main()

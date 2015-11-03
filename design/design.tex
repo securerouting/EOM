@@ -1,0 +1,67 @@
+\documentclass[12pt]{scrartcl}
+% http://tex.stackexchange.com/questions/1351/most-useful-additions-in-koma-script
+
+\usepackage{setspace}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{sectsty}
+\usepackage{wrapfig}
+\usepackage{tcolorbox}
+\usepackage{hyperref}
+\usepackage{authblk}
+
+% local command definitions
+%\sectionfont{ \sectionrule{0pt}{0pt}{-5pt}{0.8pt} } 
+
+\makeatletter
+\def\maxwidth#1{\ifdim\Gin@nat@width>#1 #1\else\Gin@nat@width\fi}
+\makeatother
+
+% usage: \Figure{file.ps}{Caption Text}{fig:labelname}
+\newcommand{\Figure}[3]{
+  \begin{figure}[ht]
+    \centering
+%    \includegraphics[width=6in]{#1}
+    \includegraphics[width=\maxwidth{6in}]{#1}
+    \caption{#2}
+    \label{#3}
+  \end{figure}
+}
+
+\newcommand{\Table}[3]{
+  \begin{table}[ht]
+    \centering
+%    \includegraphics[width=6in]{#1}
+    \includegraphics[width=\maxwidth{6in}]{#1}
+    \caption{#2}
+    \label{#3}
+  \end{table}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+% document-specific properties
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+\onehalfspacing
+\setlength{\parindent}{4em}
+\setlength{\parskip}{1em}
+
+% Front-matter
+\title{Emulation and Operation Monitoring (EOM) Tool}
+\subtitle{Design Document}
+%\author{Suresh Krishnaswamy}
+%\affil{Parsons Corp.}
+\author{Parsons Corp.}
+\date{Aug, 2015}
+\maketitle
+
+\thispagestyle{empty}
+
+% Main Document
+\include{body}
+
+\end{document}
+

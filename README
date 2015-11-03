@@ -1,0 +1,15 @@
+
+Emulation and Operation Monitoring (EOM) Tool.
+==============================================
+
+This package enables an operator to assess the operational impact of
+RPKI validation on routing behavior without actually enabling validation
+on their AS border routers. The tool accomplishes this by interfacing
+with one or more instances of an RPKI-RTR server instance and comparing
+the validated prefix information against RIB information collected from
+one or more routers. RIB information can be collected from routers using
+either Trigger or RANCID, depending on the environment that the operator
+already has in place to manage router configuration control.
+
+Note that even though most interfaces in the map_resources module are
+marked as public, they are still in flux and subject to change.
