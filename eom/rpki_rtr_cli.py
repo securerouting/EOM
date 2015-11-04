@@ -6,6 +6,7 @@ saved through the aggregator module to an internal data store.
 """
 
 import asyncore
+import netaddr
 from rpki.rtr.client   import ClientChannel
 from rpki.rtr.channels import Timestamp
 from rpki.rtr.pdus     import ResetQueryPDU, SerialQueryPDU
@@ -28,10 +29,11 @@ class EOMRPKIRtrCli(EOMGenericPoller):
             aggregator.reset_rpki_rtr_session(args.host, args.port)
         constructor = getattr(ClientChannelClass, args.protocol)
         self.client = constructor(args)
-        sql = aggregator.get_sql_connection()
-        self.client.set_sql_connection(sql)
+        self.sql = aggregator.get_sql_connection()
+        self.client.set_sql_connection(self.sql)
         self.client.update_session()
         self.polled = self.client.updated
+        self.pending = False
 
     def cleanup(self):
         """Clean up the client object associated with the poller.
@@ -79,6 +81,38 @@ class EOMRPKIRtrCli(EOMGenericPoller):
         wakeup = max(now, Timestamp(max(self.polled, self.client.updated) + timer))
         remaining = wakeup - now
         # Find if we're still waiting for data to arrive
-        pending = True if self.client.updated < self.polled else False 
+        if self.client.updated < self.polled:
+            pending = True
+        else:
+            pending = False
+            if self.pending:
+                # Fix the additional fields in the database
+                self.update_rpki_rtr_minmax()
+        self.pending = pending
         return (pending, wakeup)
+
+    def update_rpki_rtr_minmax(self):
+        """
+        For each prefix corresponding to the client's cache id update
+        the min and max prefix fields
+        """
+        cache_id = int(self.client.cache_id)
+        cur = self.sql.cursor()
+        cur.execute("SELECT asn, prefix, prefixlen, max_prefixlen "
+                    "FROM prefix "
+                    "WHERE cache_id = ?", (cache_id, ))
+        rows = cur.fetchall()
+        for r in rows:
+            (asn, prefix, prefixlen, max_prefixlen) = r
+            ipstr = unicode(str(prefix) + "/" + str(prefixlen), "utf-8")
+            prefix_min = EOMGenericPoller.get_ip_str(netaddr.IPNetwork(ipstr).first)
+            prefix_max = EOMGenericPoller.get_ip_str(netaddr.IPNetwork(ipstr).last)
+
+            cur = self.sql.cursor()
+            cur.execute("UPDATE prefix "
+                        "SET prefix_min = ?, prefix_max = ? "
+                        "WHERE cache_id = ? AND asn = ? AND prefix = ? AND prefixlen = ? AND max_prefixlen = ?",
+                        (prefix_min, prefix_max, cache_id, asn, prefix, prefixlen, max_prefixlen))
+
+        self.sql.commit()
 
