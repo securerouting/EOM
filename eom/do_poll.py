@@ -93,10 +93,16 @@ if __name__ == "__main__":
     parser.add_argument("--mode", choices=['trigger', 'rancid'], default='trigger', help="Mode of lookup")
     parser.add_argument("--rancidroot", default=RANCID_ROOT, help="Path to rancid root")
     args = parser.parse_args()
-    if args.mode == 'trigger':
-        c = TriggerCommandWrapper(args.device)
-    else:
-        c = RancidCommandWrapper(args.device)
-    r = c.poll()
+
+    r = {}
+    try:
+        if args.mode == 'trigger':
+            c = TriggerCommandWrapper(args.device)
+        else:
+            c = RancidCommandWrapper(args.device)
+        r = c.poll()
+    except:
+        pass
+
     print r
 
