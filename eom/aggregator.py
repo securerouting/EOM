@@ -70,8 +70,8 @@ class EOMAggregator:
                     prefix          TEXT NOT NULL,
                     prefixlen       INTEGER NOT NULL,
                     max_prefixlen   INTEGER NOT NULL,
-                    prefix_min      TEXT NOT NULL,
-                    prefix_max      TEXT NOT NULL,
+                    prefix_min      TEXT,
+                    prefix_max      TEXT,
                     UNIQUE          (cache_id, asn, prefix, prefixlen, max_prefixlen))''')
         cur.execute('''
                 CREATE TABLE routerkey (
