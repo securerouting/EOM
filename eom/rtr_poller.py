@@ -117,29 +117,6 @@ class RtrRIBState:
                     pass
         return results
 
-    def get_ip_str(self, ipint):
-        """Convert an IP int to an ordinal IP string.
-
-        Convert the IP int first to its dotted or string form. Then
-        expand each component so that determining ranges between two of
-        these strings becomes possible.
-
-        Args:
-            ipint: int value of an IP address
-
-        Returns:
-            Expanded string representation.
-        """
-        ipaddr = None
-        ipobj = netaddr.IPAddress(ipint)
-        if ipobj.version == 6:
-            ipaddr = ipobj.format(netaddr.ipv6_verbose)
-            ipaddr = ipaddr.upper()
-        else:
-            dotted = str(ipobj).split(".")
-            ipaddr = '.'.join([ str(i).zfill(3) for i in dotted ])
-        return ipaddr
-
     def store_in_db(self, rib):
         """Store the given RIB data into the database.
 
@@ -180,8 +157,8 @@ class RtrRIBState:
                           r.status, 
                           r.pfx, 
                           int(r.pfxlen), 
-                          self.get_ip_str(prefixint_min),
-                          self.get_ip_str(prefixint_max),
+                          EOMGenericPoller.get_ip_str(prefixint_min),
+                          EOMGenericPoller.get_ip_str(prefixint_max),
                           r.nexthop, 
                           int(r.metric) if r.metric else 0, 
                           int(r.locpref) if r.locpref else 0, 
