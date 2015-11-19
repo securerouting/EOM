@@ -104,7 +104,7 @@ class EOMAnalyzer:
         return consolidated
 
 
-class EOMAnalyzerRunner:
+class EOMEngine:
     """The analyzer module for EOM."""
 
     default_timeout = 30
@@ -141,7 +141,7 @@ class EOMAnalyzerRunner:
             earliest wakeup time. If there are no pollers in the queue,
             then both elements in the list are -1.
         """
-        wakeup = now + EOMAnalyzerRunner.default_timeout
+        wakeup = now + EOMEngine.default_timeout
         if len(self.fetchers) == 0:
             return (-1, -1)
         tp = 0
