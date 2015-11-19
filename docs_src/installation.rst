@@ -1,7 +1,6 @@
 EOM Installation
 ================
 
-
 Dependencies
 ------------
 
@@ -32,6 +31,15 @@ Installing a patched version of rpki-rtr
 EOM also needs a couple of changes to be made to the rpki.rtr code. Util
 these changes are merged into the main rpki.net software distribution,
 the patch in the patches directory need to be applied by hand.
+
+License
+-------
+
+* The EOM is distributed with a BSD-like license. See the LICENSE file for more information.
+
+* The license information for the Trigger module is at https://trigger.readthedocs.org/en/latest/license.html
+
+* The pyparsing module is distributed with a MIT license. See http://pyparsing.wikispaces.com/share/view/5698048
 
 
 Installation
