@@ -11,6 +11,9 @@ Contents:
 .. toctree::
    :maxdepth: 4
 
+   introduction
+   installation
+   examples
    eom
 
 
