@@ -199,6 +199,20 @@ class MapResourceTests(unittest.TestCase):
         EOMReporter().show(badroutes)
         self.assertTrue(badroutes) 
 
+    def test_pretty(self):
+        t = RPKITestCase(self.sql)
+        analyzer = EOMAnalyzer(self.a)
+        t.add_vrp(1, 6, '10.0.0.0', 16, 24)
+        t.add_vrp(1, 42, '10.0.0.0', 16, 20)
+        t.add_rib_entry(1, 1, '10.0.0.0', 8, [1, 2, 422], '192.168.1.1')
+        t.add_rib_entry(1, 2, '10.0.0.0', 16, [1, 2, 42], '192.168.1.2')
+        t.add_rib_entry(1, 3, '10.0.0.0', 22, [1, 2, 42], '192.168.1.2')
+        t.add_rib_entry(1, 4, '10.0.0.0', 26, [1, 2, 6], '192.168.1.3')
+        t.stage()
+        badroutes = analyzer.analyze()
+        EOMReporter().show(badroutes)
+        self.assertTrue(badroutes) 
+
 
 if __name__ == '__main__':
     unittest.main()
