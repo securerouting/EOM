@@ -23,77 +23,10 @@ from eom.reporter import EOMReporter
 from collections import defaultdict, OrderedDict
 from pprint import pprint
 
-class EOMAnalyzer:
-    """The analyzer module for EOM."""
-
-    default_timeout = 30
-
-    def __init__(self, args):
-        """Instantiate the EOM analyzer object.
-
-        Args:
-            args: A namespace of arguments. 
-                rpki_serv provides a list of arguments for any rpki-rtr pollers
-                rtr_rib provides a list of arguments for any router rib pollers
-        """
-        self.fetchers = []
-        self.aggregator = EOMAggregator(args.sql_database)
-        self.reporter = EOMReporter()
-        self.continuous = args.continuous
-        # Add pollers based on the args
-        if args.rpki_serv:
-            for r in args.rpki_serv:
-                self.add_rpkirtr_fetcher(r)
-        if args.rtr_rib:
-            for r in args.rtr_rib:
-                self.add_rtr_rib_fetcher(r)
-
-    def process_fetchers(self, now):
-        """Process list of pollers and fetch data.
-
-        Args:
-            now: current timestamp
-
-        Returns:
-            A tuple containing the number of pending pollers and the
-            earliest wakeup time. If there are no pollers in the queue,
-            then both elements in the list are -1.
-        """
-        wakeup = now + EOMAnalyzer.default_timeout
-        if len(self.fetchers) == 0:
-            return (-1, -1)
-        tp = 0
-        for f in self.fetchers:
-            (pending, nextwake) = f.poll(now)
-            if pending:
-                tp += 1
-                if nextwake < wakeup:
-                    wakeup = nextwake
-        return (tp, wakeup)
-        
-    def add_rpkirtr_fetcher(self, rpkirtr_args):
-        """Add a new rpkirtr poller instance.
-
-        Args:
-            rpkirtr_args: Arguments for the EOMRPKIRtrCli instance. 
-
-        Returns:
-            None
-        """
-        f = EOMRPKIRtrCli(rpkirtr_args, self.aggregator)
-        self.fetchers.append(f)
-
-    def add_rtr_rib_fetcher(self, rtrrib_args):
-        """Add a new rtr_rib poller instance.
-
-        Args:
-            rtrrib_args: Arguments for the EOMRtrRIBFetcher instance. 
-
-        Returns:
-            None
-        """
-        f = EOMRtrRIBFetcher(rtrrib_args, self.aggregator)
-        self.fetchers.append(f)
+class EOMAnalyzerEngine:
+    def __init__(self, aggregator):
+        self.aggregator = aggregator
+        pass
 
     def analyze(self):
         """Extract data from database and analyze.
@@ -107,7 +40,7 @@ class EOMAnalyzer:
             None
 
         Returns:
-            None
+            A result dict structure
         """
         rib_good_info = defaultdict(dict)
         rib_bad_info = defaultdict(dict)
@@ -145,9 +78,8 @@ class EOMAnalyzer:
                 else:
                     mismatch[rtr_id][index] = [(asn, rpkirtrpfxstr)]
 
-        # display all bad paths
+        # return all affected paths
         consolidated = defaultdict(dict)
-
         # Find all less-specific prefixes
         # XXX Needs to be optimized
         for rtr_id in rib_bad_info:
@@ -169,8 +101,82 @@ class EOMAnalyzer:
                         consolidated[rtr_id][idx] = ("V", rib_good_info[rtr_id][idx], [])
                     else:
                         consolidated[rtr_id][idx] = ("-", rib_tup, [])
-                    
-        self.reporter.show(consolidated)
+        return consolidated
+
+
+class EOMAnalyzerRunner:
+    """The analyzer module for EOM."""
+
+    default_timeout = 30
+
+    def __init__(self, args):
+        """Instantiate the EOM analyzer object.
+
+        Args:
+            args: A namespace of arguments. 
+                rpki_serv provides a list of arguments for any rpki-rtr pollers
+                rtr_rib provides a list of arguments for any router rib pollers
+        """
+        self.fetchers = []
+        self.aggregator = EOMAggregator(args.sql_database)
+        self.analyzer = EOMAnalyzerEngine(self.aggregator)
+        self.reporter = EOMReporter()
+        self.continuous = args.continuous
+        # Add pollers based on the args
+        if args.rpki_serv:
+            for r in args.rpki_serv:
+                self.add_rpkirtr_fetcher(r)
+        if args.rtr_rib:
+            for r in args.rtr_rib:
+                self.add_rtr_rib_fetcher(r)
+
+    def process_fetchers(self, now):
+        """Process list of pollers and fetch data.
+
+        Args:
+            now: current timestamp
+
+        Returns:
+            A tuple containing the number of pending pollers and the
+            earliest wakeup time. If there are no pollers in the queue,
+            then both elements in the list are -1.
+        """
+        wakeup = now + EOMAnalyzerRunner.default_timeout
+        if len(self.fetchers) == 0:
+            return (-1, -1)
+        tp = 0
+        for f in self.fetchers:
+            (pending, nextwake) = f.poll(now)
+            if pending:
+                tp += 1
+                if nextwake < wakeup:
+                    wakeup = nextwake
+        return (tp, wakeup)
+        
+    def add_rpkirtr_fetcher(self, rpkirtr_args):
+        """Add a new rpkirtr poller instance.
+
+        Args:
+            rpkirtr_args: Arguments for the EOMRPKIRtrCli instance. 
+
+        Returns:
+            None
+        """
+        f = EOMRPKIRtrCli(rpkirtr_args, self.aggregator)
+        self.fetchers.append(f)
+
+    def add_rtr_rib_fetcher(self, rtrrib_args):
+        """Add a new rtr_rib poller instance.
+
+        Args:
+            rtrrib_args: Arguments for the EOMRtrRIBFetcher instance. 
+
+        Returns:
+            None
+        """
+        f = EOMRtrRIBFetcher(rtrrib_args, self.aggregator)
+        self.fetchers.append(f)
+
 
     def run(self):
         """Kick off the analyzer process loop.
@@ -198,7 +204,8 @@ class EOMAnalyzer:
                     print "Waiting for " + str(remaining)
                     asyncore.loop(timeout = remaining, count = 1)
                 else:
-                    self.analyze()
+                    result = self.analyzer.analyze()
+                    self.reporter.show(result)
                     if not self.continuous:
                         break
                     print "sleeping for " + str(remaining)
