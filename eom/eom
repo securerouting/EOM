@@ -11,7 +11,7 @@ import logging
 import logging.handlers
 import argparse
 
-from eom.analyzer import eom_parse_args, EOMAnalyzer
+from eom.analyzer import eom_parse_args, EOMAnalyzerRunner
 
 class Formatter(logging.Formatter):
 
@@ -55,7 +55,7 @@ def main():
     parser = eom_parse_args(__doc__)
     args = parser.parse_args()
 #    setup_logging(args)
-    analyzer = EOMAnalyzer(args)
+    analyzer = EOMAnalyzerRunner(args)
     analyzer.run() 
 
 
