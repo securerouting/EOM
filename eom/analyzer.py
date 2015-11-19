@@ -23,7 +23,7 @@ from eom.reporter import EOMReporter
 from collections import defaultdict, OrderedDict
 from pprint import pprint
 
-class EOMAnalyzerEngine:
+class EOMAnalyzer:
     def __init__(self, aggregator):
         self.aggregator = aggregator
         pass
@@ -119,7 +119,7 @@ class EOMAnalyzerRunner:
         """
         self.fetchers = []
         self.aggregator = EOMAggregator(args.sql_database)
-        self.analyzer = EOMAnalyzerEngine(self.aggregator)
+        self.analyzer = EOMAnalyzer(self.aggregator)
         self.reporter = EOMReporter()
         self.continuous = args.continuous
         # Add pollers based on the args

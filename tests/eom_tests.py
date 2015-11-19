@@ -8,7 +8,7 @@ import unittest
 import netaddr
 from pprint import pprint
 from StringIO import StringIO
-from eom.analyzer import EOMAnalyzerEngine
+from eom.analyzer import EOMAnalyzer
 from eom.aggregator import EOMAggregator
 from eom.reporter import EOMReporter
 from eom.generic_poller import EOMGenericPoller
@@ -112,7 +112,7 @@ class MapResourceTests(unittest.TestCase):
 
     def test_good_roa(self):
         t = RPKITestCase(self.sql)
-        analyzer = EOMAnalyzerEngine(self.a)
+        analyzer = EOMAnalyzer(self.a)
         t.add_vrp(1, 42, '10.0.0.0', 16, 16)
         t.add_rib_entry(1, 1, '10.0.0.0', 16, [1, 2, 42], '192.168.1.1')
         t.stage()
@@ -121,7 +121,7 @@ class MapResourceTests(unittest.TestCase):
 
     def test_good_range(self):
         t = RPKITestCase(self.sql)
-        analyzer = EOMAnalyzerEngine(self.a)
+        analyzer = EOMAnalyzer(self.a)
         t.add_vrp(1, 42, '10.0.0.0', 12, 16)
         t.add_rib_entry(1, 1, '10.0.0.0', 16, [1, 2, 42], '192.168.1.1')
         t.stage()
@@ -130,7 +130,7 @@ class MapResourceTests(unittest.TestCase):
 
     def test_good_unknown(self):
         t = RPKITestCase(self.sql)
-        analyzer = EOMAnalyzerEngine(self.a)
+        analyzer = EOMAnalyzer(self.a)
         t.add_vrp(1, 42, '10.0.0.0', 18, 20)
         t.add_rib_entry(1, 1, '10.0.0.0', 16, [1, 2, 42], '192.168.1.1')
         t.stage()
@@ -139,7 +139,7 @@ class MapResourceTests(unittest.TestCase):
 
     def test_bad_origin(self):
         t = RPKITestCase(self.sql)
-        analyzer = EOMAnalyzerEngine(self.a)
+        analyzer = EOMAnalyzer(self.a)
         t.add_vrp(1, 42, '10.0.0.0', 16, 24)
         t.add_rib_entry(1, 1, '10.0.0.0', 16, [1, 2, 666], '192.168.1.1')
         t.stage()
@@ -149,7 +149,7 @@ class MapResourceTests(unittest.TestCase):
 
     def test_bad_too_long(self):
         t = RPKITestCase(self.sql)
-        analyzer = EOMAnalyzerEngine(self.a)
+        analyzer = EOMAnalyzer(self.a)
         t.add_vrp(1, 42, '10.0.0.0', 8, 12)
         t.add_rib_entry(1, 1, '10.0.0.0', 16, [1, 2, 42], '192.168.1.1')
         t.stage()
@@ -159,7 +159,7 @@ class MapResourceTests(unittest.TestCase):
 
     def test_multiple_match1(self):
         t = RPKITestCase(self.sql)
-        analyzer = EOMAnalyzerEngine(self.a)
+        analyzer = EOMAnalyzer(self.a)
         t.add_vrp(1, 6, '10.0.0.0', 16, 24)
         t.add_vrp(1, 42, '10.0.0.0', 16, 20)
         t.add_rib_entry(1, 1, '10.0.0.0', 24, [1, 2, 6], '192.168.1.1')
@@ -169,7 +169,7 @@ class MapResourceTests(unittest.TestCase):
 
     def test_multiple_match2(self):
         t = RPKITestCase(self.sql)
-        analyzer = EOMAnalyzerEngine(self.a)
+        analyzer = EOMAnalyzer(self.a)
         t.add_vrp(1, 6, '10.0.0.0', 16, 24)
         t.add_vrp(1, 42, '10.0.0.0', 16, 20)
         t.add_rib_entry(1, 1, '10.0.0.0', 16, [1, 2, 42], '192.168.1.1')
@@ -179,7 +179,7 @@ class MapResourceTests(unittest.TestCase):
 
     def test_multiple_mismatch_asn(self):
         t = RPKITestCase(self.sql)
-        analyzer = EOMAnalyzerEngine(self.a)
+        analyzer = EOMAnalyzer(self.a)
         t.add_vrp(1, 6, '10.0.0.0', 16, 24)
         t.add_vrp(1, 42, '10.0.0.0', 16, 20)
         t.add_rib_entry(1, 1, '10.0.0.0', 22, [1, 2, 42], '192.168.1.1')
@@ -190,7 +190,7 @@ class MapResourceTests(unittest.TestCase):
 
     def test_multiple_mismatch_len(self):
         t = RPKITestCase(self.sql)
-        analyzer = EOMAnalyzerEngine(self.a)
+        analyzer = EOMAnalyzer(self.a)
         t.add_vrp(1, 6, '10.0.0.0', 16, 24)
         t.add_vrp(1, 42, '10.0.0.0', 16, 20)
         t.add_rib_entry(1, 1, '10.0.0.0', 26, [1, 2, 6], '192.168.1.1')
