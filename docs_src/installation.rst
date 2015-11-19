@@ -32,6 +32,15 @@ EOM also needs a couple of changes to be made to the rpki.rtr code. Util
 these changes are merged into the main rpki.net software distribution,
 the patch in the patches directory need to be applied by hand.
 
+
+Trigger setup
+-------------
+
+EOM assumes that the operator already has a pre-configured Trigger setup
+for router management. Information on configuring Trigger can be found
+on https://trigger.readthedocs.org/en/latest
+
+
 License
 -------
 
