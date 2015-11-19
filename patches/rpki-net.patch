@@ -1,0 +1,32 @@
+Index: trunk/rpki/rtr/client.py
+===================================================================
+--- trunk/rpki/rtr/client.py	(revision 6158)
++++ trunk/rpki/rtr/client.py	(working copy)
+@@ -194,6 +194,13 @@
+     if args.sql_database:
+       self.setup_sql()
+ 
++  def set_sql_connection(self, sqlcon):
++    """
++    Use the sql connection provided instead of the one created during
++    instantiation.
++    """
++    self.sql = sqlcon
++
+   @classmethod
+   def ssh(cls, args):
+     """
+@@ -324,6 +331,13 @@
+                 UNIQUE          (cache_id, asn, key))''')
+     elif self.args.reset_session:
+       cur.execute("DELETE FROM cache WHERE host = ? and port = ?", (self.host, self.port))
++    self.update_session()
++
++  def update_session(self):
++    """
++    Update state if a session already exists.
++    """
++    cur = self.sql.cursor()
+     cur.execute("SELECT cache_id, version, nonce, serial, refresh, retry, expire, updated "
+                 "FROM cache WHERE host = ? AND port = ?",
+                 (self.host, self.port))
