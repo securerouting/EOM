@@ -1,4 +1,6 @@
 include LICENSE README 
 recursive-include eom *.py
 recursive-include docs *
+recursive-include tests *
+recursive-include patches *
 prune docs_src
