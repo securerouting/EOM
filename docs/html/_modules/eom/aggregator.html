@@ -123,8 +123,8 @@
 <span class="s">                    prefix          TEXT NOT NULL,</span>
 <span class="s">                    prefixlen       INTEGER NOT NULL,</span>
 <span class="s">                    max_prefixlen   INTEGER NOT NULL,</span>
-<span class="s">                    prefix_min      TEXT NOT NULL,</span>
-<span class="s">                    prefix_max      TEXT NOT NULL,</span>
+<span class="s">                    prefix_min      TEXT,</span>
+<span class="s">                    prefix_max      TEXT,</span>
 <span class="s">                    UNIQUE          (cache_id, asn, prefix, prefixlen, max_prefixlen))&#39;&#39;&#39;</span><span class="p">)</span>
         <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&#39;&#39;&#39;</span>
 <span class="s">                CREATE TABLE routerkey (</span>

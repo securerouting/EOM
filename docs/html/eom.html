@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="eom  documentation" href="index.html" />
-    <link rel="prev" title="Welcome to eom’s documentation!" href="index.html" />
+    <link rel="prev" title="EOM Examples" href="examples.html" />
    
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
@@ -41,7 +41,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="index.html" title="Welcome to eom’s documentation!"
+          <a href="examples.html" title="EOM Examples"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">eom  documentation</a> &raquo;</li> 
       </ul>
@@ -172,33 +172,8 @@ feeds such data to data analysis modules for further processing and
 report generation.</p>
 <dl class="class">
 <dt id="eom.analyzer.EOMAnalyzer">
-<em class="property">class </em><code class="descclassname">eom.analyzer.</code><code class="descname">EOMAnalyzer</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/analyzer.html#EOMAnalyzer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.analyzer.EOMAnalyzer" title="Permalink to this definition">¶</a></dt>
-<dd><p>The analyzer module for EOM.</p>
-<dl class="method">
-<dt id="eom.analyzer.EOMAnalyzer.add_rpkirtr_fetcher">
-<code class="descname">add_rpkirtr_fetcher</code><span class="sig-paren">(</span><em>rpkirtr_args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/analyzer.html#EOMAnalyzer.add_rpkirtr_fetcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.analyzer.EOMAnalyzer.add_rpkirtr_fetcher" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add a new rpkirtr poller instance.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>rpkirtr_args: Arguments for the EOMRPKIRtrCli instance.</dd>
-<dt>Returns:</dt>
-<dd>None</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="eom.analyzer.EOMAnalyzer.add_rtr_rib_fetcher">
-<code class="descname">add_rtr_rib_fetcher</code><span class="sig-paren">(</span><em>rtrrib_args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/analyzer.html#EOMAnalyzer.add_rtr_rib_fetcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.analyzer.EOMAnalyzer.add_rtr_rib_fetcher" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add a new rtr_rib poller instance.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>rtrrib_args: Arguments for the EOMRtrRIBFetcher instance.</dd>
-<dt>Returns:</dt>
-<dd>None</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
+<em class="property">class </em><code class="descclassname">eom.analyzer.</code><code class="descname">EOMAnalyzer</code><span class="sig-paren">(</span><em>aggregator</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/analyzer.html#EOMAnalyzer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.analyzer.EOMAnalyzer" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
 <dt id="eom.analyzer.EOMAnalyzer.analyze">
 <code class="descname">analyze</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/analyzer.html#EOMAnalyzer.analyze"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.analyzer.EOMAnalyzer.analyze" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract data from database and analyze.</p>
@@ -210,18 +185,48 @@ EOMReporter module.</p>
 <dt>Args:</dt>
 <dd>None</dd>
 <dt>Returns:</dt>
+<dd>A result dict structure</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="eom.analyzer.EOMEngine">
+<em class="property">class </em><code class="descclassname">eom.analyzer.</code><code class="descname">EOMEngine</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/analyzer.html#EOMEngine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.analyzer.EOMEngine" title="Permalink to this definition">¶</a></dt>
+<dd><p>The analyzer module for EOM.</p>
+<dl class="method">
+<dt id="eom.analyzer.EOMEngine.add_rpkirtr_fetcher">
+<code class="descname">add_rpkirtr_fetcher</code><span class="sig-paren">(</span><em>rpkirtr_args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/analyzer.html#EOMEngine.add_rpkirtr_fetcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.analyzer.EOMEngine.add_rpkirtr_fetcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a new rpkirtr poller instance.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>rpkirtr_args: Arguments for the EOMRPKIRtrCli instance.</dd>
+<dt>Returns:</dt>
+<dd>None</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="eom.analyzer.EOMEngine.add_rtr_rib_fetcher">
+<code class="descname">add_rtr_rib_fetcher</code><span class="sig-paren">(</span><em>rtrrib_args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/analyzer.html#EOMEngine.add_rtr_rib_fetcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.analyzer.EOMEngine.add_rtr_rib_fetcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a new rtr_rib poller instance.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>rtrrib_args: Arguments for the EOMRtrRIBFetcher instance.</dd>
+<dt>Returns:</dt>
 <dd>None</dd>
 </dl>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="eom.analyzer.EOMAnalyzer.default_timeout">
-<code class="descname">default_timeout</code><em class="property"> = 30</em><a class="headerlink" href="#eom.analyzer.EOMAnalyzer.default_timeout" title="Permalink to this definition">¶</a></dt>
+<dt id="eom.analyzer.EOMEngine.default_timeout">
+<code class="descname">default_timeout</code><em class="property"> = 30</em><a class="headerlink" href="#eom.analyzer.EOMEngine.default_timeout" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="eom.analyzer.EOMAnalyzer.process_fetchers">
-<code class="descname">process_fetchers</code><span class="sig-paren">(</span><em>now</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/analyzer.html#EOMAnalyzer.process_fetchers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.analyzer.EOMAnalyzer.process_fetchers" title="Permalink to this definition">¶</a></dt>
+<dt id="eom.analyzer.EOMEngine.process_fetchers">
+<code class="descname">process_fetchers</code><span class="sig-paren">(</span><em>now</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/analyzer.html#EOMEngine.process_fetchers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.analyzer.EOMEngine.process_fetchers" title="Permalink to this definition">¶</a></dt>
 <dd><p>Process list of pollers and fetch data.</p>
 <dl class="docutils">
 <dt>Args:</dt>
@@ -234,8 +239,8 @@ then both elements in the list are -1.</dd>
 </dd></dl>
 
 <dl class="method">
-<dt id="eom.analyzer.EOMAnalyzer.run">
-<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/analyzer.html#EOMAnalyzer.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.analyzer.EOMAnalyzer.run" title="Permalink to this definition">¶</a></dt>
+<dt id="eom.analyzer.EOMEngine.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/analyzer.html#EOMEngine.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.analyzer.EOMEngine.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Kick off the analyzer process loop.</p>
 <p>Process all pollers, once we have all data run the analysis
 routine and repeat the loop.</p>
@@ -335,6 +340,21 @@ operations.</p>
 <p>This method must be overridden by sub-classes.</p>
 </dd></dl>
 
+<dl class="staticmethod">
+<dt id="eom.generic_poller.EOMGenericPoller.get_ip_str">
+<em class="property">static </em><code class="descname">get_ip_str</code><span class="sig-paren">(</span><em>ipint</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/generic_poller.html#EOMGenericPoller.get_ip_str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.generic_poller.EOMGenericPoller.get_ip_str" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert an IP int to an ordinal IP string.</p>
+<p>Convert the IP int first to its dotted or string form. Then
+expand each component so that determining ranges between two of
+these strings becomes possible.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>ipint: int value of an IP address</dd>
+<dt>Returns:</dt>
+<dd>Expanded string representation.</dd>
+</dl>
+</dd></dl>
+
 <dl class="method">
 <dt id="eom.generic_poller.EOMGenericPoller.poll">
 <code class="descname">poll</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/generic_poller.html#EOMGenericPoller.poll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.generic_poller.EOMGenericPoller.poll" title="Permalink to this definition">¶</a></dt>
@@ -426,6 +446,13 @@ during this time interval.</p>
 </dl>
 </dd></dl>
 
+<dl class="method">
+<dt id="eom.rpki_rtr_cli.EOMRPKIRtrCli.update_rpki_rtr_minmax">
+<code class="descname">update_rpki_rtr_minmax</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/rpki_rtr_cli.html#EOMRPKIRtrCli.update_rpki_rtr_minmax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.rpki_rtr_cli.EOMRPKIRtrCli.update_rpki_rtr_minmax" title="Permalink to this definition">¶</a></dt>
+<dd><p>For each prefix corresponding to the client&#8217;s cache id update
+the min and max prefix fields</p>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -485,21 +512,6 @@ to use the Python twisted framework.</p>
 <dd><p>Define the grammar for the BGP output.</p>
 <p>See also:
 <a class="reference external" href="http://stackoverflow.com/questions/30997205/pyparsing-parsing-ciscos-show-ip-bgp">http://stackoverflow.com/questions/30997205/pyparsing-parsing-ciscos-show-ip-bgp</a></p>
-</dd></dl>
-
-<dl class="method">
-<dt id="eom.rtr_poller.RtrRIBState.get_ip_str">
-<code class="descname">get_ip_str</code><span class="sig-paren">(</span><em>ipint</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/rtr_poller.html#RtrRIBState.get_ip_str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.rtr_poller.RtrRIBState.get_ip_str" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert an IP int to an ordinal IP string.</p>
-<p>Convert the IP int first to its dotted or string form. Then
-expand each component so that determining ranges between two of
-these strings becomes possible.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>ipint: int value of an IP address</dd>
-<dt>Returns:</dt>
-<dd>Expanded string representation.</dd>
-</dl>
 </dd></dl>
 
 <dl class="method">
@@ -584,8 +596,8 @@ TriggerCommandWrapper: Subclass for issuing router commands using Trigger</p>
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="index.html"
-                        title="previous chapter">Welcome to eom&#8217;s documentation!</a></p>
+  <p class="topless"><a href="examples.html"
+                        title="previous chapter">EOM Examples</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">

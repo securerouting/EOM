@@ -60,6 +60,8 @@
 <span class="sd">operations.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
+<span class="kn">import</span> <span class="nn">netaddr</span>
+
 <div class="viewcode-block" id="EOMGenericPoller"><a class="viewcode-back" href="../../eom.html#eom.generic_poller.EOMGenericPoller">[docs]</a><span class="k">class</span> <span class="nc">EOMGenericPoller</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;A generic poller&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conf</span><span class="p">,</span> <span class="n">aggregator</span><span class="p">):</span>
@@ -83,8 +85,32 @@
 <span class="sd">            </span>
 <span class="sd">        This method must be overridden by sub-classes.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div></div>
-</pre></div>
+        <span class="k">pass</span>
+</div>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="EOMGenericPoller.get_ip_str"><a class="viewcode-back" href="../../eom.html#eom.generic_poller.EOMGenericPoller.get_ip_str">[docs]</a>    <span class="k">def</span> <span class="nf">get_ip_str</span><span class="p">(</span><span class="n">ipint</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert an IP int to an ordinal IP string.</span>
+
+<span class="sd">        Convert the IP int first to its dotted or string form. Then</span>
+<span class="sd">        expand each component so that determining ranges between two of</span>
+<span class="sd">        these strings becomes possible.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ipint: int value of an IP address</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Expanded string representation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ipaddr</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">ipobj</span> <span class="o">=</span> <span class="n">netaddr</span><span class="o">.</span><span class="n">IPAddress</span><span class="p">(</span><span class="n">ipint</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ipobj</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+            <span class="n">ipaddr</span> <span class="o">=</span> <span class="n">ipobj</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">netaddr</span><span class="o">.</span><span class="n">ipv6_verbose</span><span class="p">)</span>
+            <span class="n">ipaddr</span> <span class="o">=</span> <span class="n">ipaddr</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dotted</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ipobj</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)</span>
+            <span class="n">ipaddr</span> <span class="o">=</span> <span class="s">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">dotted</span> <span class="p">])</span>
+        <span class="k">return</span> <span class="n">ipaddr</span>
+</pre></div></div></div>
 
           </div>
         </div>

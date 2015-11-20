@@ -59,6 +59,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">asyncore</span>
+<span class="kn">import</span> <span class="nn">netaddr</span>
 <span class="kn">from</span> <span class="nn">rpki.rtr.client</span>   <span class="kn">import</span> <span class="n">ClientChannel</span>
 <span class="kn">from</span> <span class="nn">rpki.rtr.channels</span> <span class="kn">import</span> <span class="n">Timestamp</span>
 <span class="kn">from</span> <span class="nn">rpki.rtr.pdus</span>     <span class="kn">import</span> <span class="n">ResetQueryPDU</span><span class="p">,</span> <span class="n">SerialQueryPDU</span>
@@ -81,10 +82,11 @@
             <span class="n">aggregator</span><span class="o">.</span><span class="n">reset_rpki_rtr_session</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">port</span><span class="p">)</span>
         <span class="n">constructor</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">ClientChannelClass</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">protocol</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">constructor</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
-        <span class="n">sql</span> <span class="o">=</span> <span class="n">aggregator</span><span class="o">.</span><span class="n">get_sql_connection</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">set_sql_connection</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span> <span class="o">=</span> <span class="n">aggregator</span><span class="o">.</span><span class="n">get_sql_connection</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">set_sql_connection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">update_session</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">polled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">updated</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pending</span> <span class="o">=</span> <span class="bp">False</span>
 
 <div class="viewcode-block" id="EOMRPKIRtrCli.cleanup"><a class="viewcode-back" href="../../eom.html#eom.rpki_rtr_cli.EOMRPKIRtrCli.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Clean up the client object associated with the poller.</span>
@@ -132,8 +134,40 @@
         <span class="n">wakeup</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">now</span><span class="p">,</span> <span class="n">Timestamp</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">polled</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">updated</span><span class="p">)</span> <span class="o">+</span> <span class="n">timer</span><span class="p">))</span>
         <span class="n">remaining</span> <span class="o">=</span> <span class="n">wakeup</span> <span class="o">-</span> <span class="n">now</span>
         <span class="c"># Find if we&#39;re still waiting for data to arrive</span>
-        <span class="n">pending</span> <span class="o">=</span> <span class="bp">True</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">updated</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">polled</span> <span class="k">else</span> <span class="bp">False</span> 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">updated</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">polled</span><span class="p">:</span>
+            <span class="n">pending</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pending</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pending</span><span class="p">:</span>
+                <span class="c"># Fix the additional fields in the database</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update_rpki_rtr_minmax</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pending</span> <span class="o">=</span> <span class="n">pending</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">pending</span><span class="p">,</span> <span class="n">wakeup</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="EOMRPKIRtrCli.update_rpki_rtr_minmax"><a class="viewcode-back" href="../../eom.html#eom.rpki_rtr_cli.EOMRPKIRtrCli.update_rpki_rtr_minmax">[docs]</a>    <span class="k">def</span> <span class="nf">update_rpki_rtr_minmax</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        For each prefix corresponding to the client&#39;s cache id update</span>
+<span class="sd">        the min and max prefix fields</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cache_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">cache_id</span><span class="p">)</span>
+        <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;SELECT asn, prefix, prefixlen, max_prefixlen &quot;</span>
+                    <span class="s">&quot;FROM prefix &quot;</span>
+                    <span class="s">&quot;WHERE cache_id = ?&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">cache_id</span><span class="p">,</span> <span class="p">))</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="p">(</span><span class="n">asn</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">prefixlen</span><span class="p">,</span> <span class="n">max_prefixlen</span><span class="p">)</span> <span class="o">=</span> <span class="n">r</span>
+            <span class="n">ipstr</span> <span class="o">=</span> <span class="nb">unicode</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot;/&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">prefixlen</span><span class="p">),</span> <span class="s">&quot;utf-8&quot;</span><span class="p">)</span>
+            <span class="n">prefix_min</span> <span class="o">=</span> <span class="n">EOMGenericPoller</span><span class="o">.</span><span class="n">get_ip_str</span><span class="p">(</span><span class="n">netaddr</span><span class="o">.</span><span class="n">IPNetwork</span><span class="p">(</span><span class="n">ipstr</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">)</span>
+            <span class="n">prefix_max</span> <span class="o">=</span> <span class="n">EOMGenericPoller</span><span class="o">.</span><span class="n">get_ip_str</span><span class="p">(</span><span class="n">netaddr</span><span class="o">.</span><span class="n">IPNetwork</span><span class="p">(</span><span class="n">ipstr</span><span class="p">)</span><span class="o">.</span><span class="n">last</span><span class="p">)</span>
+
+            <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+            <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;UPDATE prefix &quot;</span>
+                        <span class="s">&quot;SET prefix_min = ?, prefix_max = ? &quot;</span>
+                        <span class="s">&quot;WHERE cache_id = ? AND asn = ? AND prefix = ? AND prefixlen = ? AND max_prefixlen = ?&quot;</span><span class="p">,</span>
+                        <span class="p">(</span><span class="n">prefix_min</span><span class="p">,</span> <span class="n">prefix_max</span><span class="p">,</span> <span class="n">cache_id</span><span class="p">,</span> <span class="n">asn</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">prefixlen</span><span class="p">,</span> <span class="n">max_prefixlen</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
 </pre></div></div></div>
 
           </div>

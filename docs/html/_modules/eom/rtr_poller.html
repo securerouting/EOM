@@ -170,29 +170,6 @@
                     <span class="k">pass</span>
         <span class="k">return</span> <span class="n">results</span>
 </div>
-<div class="viewcode-block" id="RtrRIBState.get_ip_str"><a class="viewcode-back" href="../../eom.html#eom.rtr_poller.RtrRIBState.get_ip_str">[docs]</a>    <span class="k">def</span> <span class="nf">get_ip_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ipint</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Convert an IP int to an ordinal IP string.</span>
-
-<span class="sd">        Convert the IP int first to its dotted or string form. Then</span>
-<span class="sd">        expand each component so that determining ranges between two of</span>
-<span class="sd">        these strings becomes possible.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            ipint: int value of an IP address</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            Expanded string representation.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">ipaddr</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="n">ipobj</span> <span class="o">=</span> <span class="n">netaddr</span><span class="o">.</span><span class="n">IPAddress</span><span class="p">(</span><span class="n">ipint</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">ipobj</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
-            <span class="n">ipaddr</span> <span class="o">=</span> <span class="n">ipobj</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">netaddr</span><span class="o">.</span><span class="n">ipv6_verbose</span><span class="p">)</span>
-            <span class="n">ipaddr</span> <span class="o">=</span> <span class="n">ipaddr</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">dotted</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ipobj</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)</span>
-            <span class="n">ipaddr</span> <span class="o">=</span> <span class="s">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">dotted</span> <span class="p">])</span>
-        <span class="k">return</span> <span class="n">ipaddr</span>
-</div>
 <div class="viewcode-block" id="RtrRIBState.store_in_db"><a class="viewcode-back" href="../../eom.html#eom.rtr_poller.RtrRIBState.store_in_db">[docs]</a>    <span class="k">def</span> <span class="nf">store_in_db</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rib</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Store the given RIB data into the database.</span>
 
@@ -233,8 +210,8 @@
                           <span class="n">r</span><span class="o">.</span><span class="n">status</span><span class="p">,</span> 
                           <span class="n">r</span><span class="o">.</span><span class="n">pfx</span><span class="p">,</span> 
                           <span class="nb">int</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">pfxlen</span><span class="p">),</span> 
-                          <span class="bp">self</span><span class="o">.</span><span class="n">get_ip_str</span><span class="p">(</span><span class="n">prefixint_min</span><span class="p">),</span>
-                          <span class="bp">self</span><span class="o">.</span><span class="n">get_ip_str</span><span class="p">(</span><span class="n">prefixint_max</span><span class="p">),</span>
+                          <span class="n">EOMGenericPoller</span><span class="o">.</span><span class="n">get_ip_str</span><span class="p">(</span><span class="n">prefixint_min</span><span class="p">),</span>
+                          <span class="n">EOMGenericPoller</span><span class="o">.</span><span class="n">get_ip_str</span><span class="p">(</span><span class="n">prefixint_max</span><span class="p">),</span>
                           <span class="n">r</span><span class="o">.</span><span class="n">nexthop</span><span class="p">,</span> 
                           <span class="nb">int</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">metric</span><span class="p">)</span> <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">metric</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span> 
                           <span class="nb">int</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">locpref</span><span class="p">)</span> <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">locpref</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span> 
