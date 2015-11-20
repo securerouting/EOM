@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>EOM Installation &mdash; eom  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="eom  documentation" href="index.html" />
+    <link rel="next" title="EOM Examples" href="examples.html" />
+    <link rel="prev" title="EOM - An Emulation and Operations Monitoring Tool" href="introduction.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="examples.html" title="EOM Examples"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="introduction.html" title="EOM - An Emulation and Operations Monitoring Tool"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">eom  documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="eom-installation">
+<h1>EOM Installation<a class="headerlink" href="#eom-installation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="dependencies">
+<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
+<p>The following packages must be installed prior to installation of the
+eom package.</p>
+<ul class="simple">
+<li>sqlite3</li>
+<li>os</li>
+<li>trigger</li>
+<li>asyncore</li>
+<li>argparse</li>
+<li>sys</li>
+<li>time</li>
+<li>collections</li>
+<li>pprint</li>
+<li>json</li>
+<li>rpki.rtr</li>
+<li>subprocess</li>
+<li>re</li>
+<li>netaddr</li>
+<li>pipes</li>
+<li>pyparsing</li>
+<li>logging</li>
+</ul>
+</div>
+<div class="section" id="installing-a-patched-version-of-rpki-rtr">
+<h2>Installing a patched version of rpki-rtr<a class="headerlink" href="#installing-a-patched-version-of-rpki-rtr" title="Permalink to this headline">¶</a></h2>
+<p>EOM also needs a couple of changes to be made to the rpki.rtr code. Util
+these changes are merged into the main rpki.net software distribution,
+the patch in the patches directory need to be applied by hand.</p>
+</div>
+<div class="section" id="trigger-setup">
+<h2>Trigger setup<a class="headerlink" href="#trigger-setup" title="Permalink to this headline">¶</a></h2>
+<p>EOM assumes that the operator already has a pre-configured Trigger setup
+for router management. Information on configuring Trigger can be found
+on <a class="reference external" href="https://trigger.readthedocs.org/en/latest">https://trigger.readthedocs.org/en/latest</a></p>
+</div>
+<div class="section" id="license">
+<h2>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>The EOM is distributed with a BSD-like license. See the LICENSE file for more information.</li>
+<li>The license information for the Trigger module is at <a class="reference external" href="https://trigger.readthedocs.org/en/latest/license.html">https://trigger.readthedocs.org/en/latest/license.html</a></li>
+<li>The pyparsing module is distributed with a MIT license. See <a class="reference external" href="http://pyparsing.wikispaces.com/share/view/5698048">http://pyparsing.wikispaces.com/share/view/5698048</a></li>
+</ul>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>The package can be installed by running the setup.py script as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ python setup.py install
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">EOM Installation</a><ul>
+<li><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li><a class="reference internal" href="#installing-a-patched-version-of-rpki-rtr">Installing a patched version of rpki-rtr</a></li>
+<li><a class="reference internal" href="#trigger-setup">Trigger setup</a></li>
+<li><a class="reference internal" href="#license">License</a></li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="introduction.html"
+                        title="previous chapter">EOM  - An Emulation and Operations Monitoring Tool</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="examples.html"
+                        title="next chapter">EOM Examples</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/installation.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.4</a>
+      
+      |
+      <a href="_sources/installation.txt"
+          rel="nofollow">Page source</a></li>
+    </div>
+
+    
+
+    
+  </body>
+</html>
