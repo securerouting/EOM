@@ -68,8 +68,10 @@ class RancidCommandWrapper(CommandWrapper):
         """
         CommandWrapper.__init__(self, devicenames)
         r = rancid.Rancid(RANCID_ROOT)
+        nd = r.devices
         for d in devicenames:
-            self.devicelist.append(r.devices.get(d))
+            if d in nd.keys():
+                self.devicelist.append(nd[d])
 
 class TriggerCommandWrapper(CommandWrapper):
     """Subclass for issuing router commands using Trigger"""
