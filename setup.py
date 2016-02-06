@@ -9,7 +9,7 @@ long_description = rh.read()
 rh.close()
 
 setup(name='EOM',
-      version='1.1',
+      version='1.2',
       description='Emulation and Operation Monitoring (EOM) Tool',
       author='Suresh Krishnaswamy',
       author_email='suresh@tislabs.com',
