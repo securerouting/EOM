@@ -38,8 +38,8 @@ rpki-rtr-cli
 
 This component provides the client interface to the rpki-rtr
 protocol.  It builds upon the existing rpki-rtr
-implementations but instead of communicating with a router this
-module interfaces with an aggregator module that maintains a
+implementation from rpki.net but instead of communicating with a router
+this module interfaces with an aggregator module that maintains a
 local data store of validated RPKI information.
 
 The rpki-rtr-cli module can communicate with multiple rpki-rtr manager
@@ -52,9 +52,20 @@ rtr-status-fetcher
 
 This module is responsible for fetching various pieces of status
 information from a router, including its routing table and next hop
-neighbors. Data from a router is fetched using the Trigger python
-module for multiple routers. The rtr-status-fetcher module saves
-all fetched data into a local store through the aggregator module. 
+neighbors. 
+
+In order to fetch router RIB information, we experimented with two
+different pieces of software. We used RANCID initially, but  later
+switched to the Trigger module in order to fetch the output from the 'sh
+ip bgp' command run on specific routers. The Trigger module provides a
+cleaner python-based interface to the RIB extraction function, but it
+has an event loop structure that is currently incompatible with the
+rpki-rtr module. This issue will be revisited in later releases of the
+EOM software in order to make the data fetch operations from the two
+modules more compatible.
+
+The rtr-status-fetcher module saves all fetched data into a local store
+through the aggregator module. 
 
 aggregator
 ~~~~~~~~~~
