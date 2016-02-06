@@ -41,7 +41,10 @@ class EOMReporter:
 
         """
         for rtr in data:
-            print "Router: " + str(rtr)
+            print "\nRouter: " + str(rtr)
+            print "   " + "\t" + "Network" + "   " + "\t" + "Next Hop" + \
+                "\t" + "Metric" + "\t" + "LocPrf" + "\t" + "Weight" + \
+                "\t" + "Path"
             for (i, v) in sorted(data[rtr].items(), key=lambda x:int(x[0])):
                 print v[0] + " : " + self.get_rib_display_str(v[1])
                 if v[2]:
