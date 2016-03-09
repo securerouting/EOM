@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>eom package &mdash; eom  documentation</title>
+    <title>eom package &mdash; eom 1.2 documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '',
+        VERSION:     '1.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="eom  documentation" href="index.html" />
+    <link rel="top" title="eom 1.2 documentation" href="index.html" />
     <link rel="prev" title="EOM Examples" href="examples.html" />
    
   
@@ -43,7 +43,7 @@
         <li class="right" >
           <a href="examples.html" title="EOM Examples"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">eom  documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">eom 1.2 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -272,54 +272,8 @@ routine and repeat the loop.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-eom.do_poll">
-<span id="eom-do-poll-module"></span><h2>eom.do_poll module<a class="headerlink" href="#module-eom.do_poll" title="Permalink to this headline">¶</a></h2>
-<p>Fetch RIB information from routers.</p>
-<p>This scripts queries the given device for its RIB information using the
-&#8216;sh ip bgp&#8217; command. The script assumes that one of either Trigger or
-RANCID has been configured in order to enable the router to authenticate
-the issuance of such commands from the querying machine.</p>
-<p>NOTE: That RANCID support appears to be not fully supported in Trigger,
-so this does not seem to work properly at the moment.</p>
-<p>The output is returned as a JSON representation of a dict structure,
-indexed on the device name and the command run.</p>
-<dl class="class">
-<dt id="eom.do_poll.CommandWrapper">
-<em class="property">class </em><code class="descclassname">eom.do_poll.</code><code class="descname">CommandWrapper</code><span class="sig-paren">(</span><em>devicenames</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/do_poll.html#CommandWrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.do_poll.CommandWrapper" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generic Command Wrapper Class.</p>
-<p>Allows us to poll the attached net devices for BGP information. 
-Note that this class must not be instantiated directly.</p>
-<dl class="method">
-<dt id="eom.do_poll.CommandWrapper.poll">
-<code class="descname">poll</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/do_poll.html#CommandWrapper.poll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.do_poll.CommandWrapper.poll" title="Permalink to this definition">¶</a></dt>
-<dd><p>Poll device list for BGP RIB information.</p>
-<p>Poll all the NetDevices that are associated with this object and
-query them for BGP RIB information using &#8216;sh ip bgp&#8217;. The
-results are returned as a JSON string.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>None.</dd>
-<dt>Returns:</dt>
-<dd>str: A JSON string representation of the results</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="eom.do_poll.RancidCommandWrapper">
-<em class="property">class </em><code class="descclassname">eom.do_poll.</code><code class="descname">RancidCommandWrapper</code><span class="sig-paren">(</span><em>devicenames</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/do_poll.html#RancidCommandWrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.do_poll.RancidCommandWrapper" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#eom.do_poll.CommandWrapper" title="eom.do_poll.CommandWrapper"><code class="xref py py-class docutils literal"><span class="pre">eom.do_poll.CommandWrapper</span></code></a></p>
-<p>Subclass for issuing router commands using RANCID</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="eom.do_poll.TriggerCommandWrapper">
-<em class="property">class </em><code class="descclassname">eom.do_poll.</code><code class="descname">TriggerCommandWrapper</code><span class="sig-paren">(</span><em>devicenames</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/do_poll.html#TriggerCommandWrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.do_poll.TriggerCommandWrapper" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#eom.do_poll.CommandWrapper" title="eom.do_poll.CommandWrapper"><code class="xref py py-class docutils literal"><span class="pre">eom.do_poll.CommandWrapper</span></code></a></p>
-<p>Subclass for issuing router commands using Trigger</p>
-</dd></dl>
-
+<div class="section" id="eom-do-poll-module">
+<h2>eom.do_poll module<a class="headerlink" href="#eom-do-poll-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-eom.generic_poller">
 <span id="eom-generic-poller-module"></span><h2>eom.generic_poller module<a class="headerlink" href="#module-eom.generic_poller" title="Permalink to this headline">¶</a></h2>
@@ -585,7 +539,7 @@ TriggerCommandWrapper: Subclass for issuing router commands using Trigger</p>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-eom.aggregator">eom.aggregator module</a></li>
 <li><a class="reference internal" href="#module-eom.analyzer">eom.analyzer module</a></li>
-<li><a class="reference internal" href="#module-eom.do_poll">eom.do_poll module</a></li>
+<li><a class="reference internal" href="#eom-do-poll-module">eom.do_poll module</a></li>
 <li><a class="reference internal" href="#module-eom.generic_poller">eom.generic_poller module</a></li>
 <li><a class="reference internal" href="#module-eom.reporter">eom.reporter module</a></li>
 <li><a class="reference internal" href="#module-eom.rpki_rtr_cli">eom.rpki_rtr_cli module</a></li>
@@ -623,7 +577,7 @@ TriggerCommandWrapper: Subclass for issuing router commands using Trigger</p>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2015, Author.
+      &copy;2015, Parsons Corp.
       
       |
       Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>EOM - An Emulation and Operations Monitoring Tool &mdash; eom  documentation</title>
+    <title>EOM - An Emulation and Operations Monitoring Tool &mdash; eom 1.2 documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '',
+        VERSION:     '1.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="eom  documentation" href="index.html" />
+    <link rel="top" title="eom 1.2 documentation" href="index.html" />
     <link rel="next" title="EOM Installation" href="installation.html" />
     <link rel="prev" title="Welcome to eom’s documentation!" href="index.html" />
    
@@ -47,7 +47,7 @@
         <li class="right" >
           <a href="index.html" title="Welcome to eom’s documentation!"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">eom  documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">eom 1.2 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -87,8 +87,8 @@ each EOM tool sub-component.</p>
 <h3>rpki-rtr-cli<a class="headerlink" href="#rpki-rtr-cli" title="Permalink to this headline">¶</a></h3>
 <p>This component provides the client interface to the rpki-rtr
 protocol.  It builds upon the existing rpki-rtr
-implementations but instead of communicating with a router this
-module interfaces with an aggregator module that maintains a
+implementation from rpki.net but instead of communicating with a router
+this module interfaces with an aggregator module that maintains a
 local data store of validated RPKI information.</p>
 <p>The rpki-rtr-cli module can communicate with multiple rpki-rtr manager
 instances in order to be able to mimic cases where an ISP relies on
@@ -99,9 +99,18 @@ information to its various ASBR routers.</p>
 <h3>rtr-status-fetcher<a class="headerlink" href="#rtr-status-fetcher" title="Permalink to this headline">¶</a></h3>
 <p>This module is responsible for fetching various pieces of status
 information from a router, including its routing table and next hop
-neighbors. Data from a router is fetched using the Trigger python
-module for multiple routers. The rtr-status-fetcher module saves
-all fetched data into a local store through the aggregator module.</p>
+neighbors.</p>
+<p>In order to fetch router RIB information, we experimented with two
+different pieces of software. We used RANCID initially, but  later
+switched to the Trigger module in order to fetch the output from the &#8216;sh
+ip bgp&#8217; command run on specific routers. The Trigger module provides a
+cleaner python-based interface to the RIB extraction function, but it
+has an event loop structure that is currently incompatible with the
+rpki-rtr module. This issue will be revisited in later releases of the
+EOM software in order to make the data fetch operations from the two
+modules more compatible.</p>
+<p>The rtr-status-fetcher module saves all fetched data into a local store
+through the aggregator module.</p>
 </div>
 <div class="section" id="aggregator">
 <h3>aggregator<a class="headerlink" href="#aggregator" title="Permalink to this headline">¶</a></h3>
@@ -220,7 +229,7 @@ of interest.</p>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2015, Author.
+      &copy;2015, Parsons Corp.
       
       |
       Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
