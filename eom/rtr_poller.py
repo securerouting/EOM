@@ -199,12 +199,14 @@ class EOMRtrRIBFetcher(EOMGenericPoller):
         """
         assert aggregator != None
         self.device = pipes.quote(args.device)
+        self.realm = pipes.quote(args.realm)
         if args.reset_session:
             aggregator.reset_rtr_rib_session(self.device)
         self.sql = aggregator.get_sql_connection()
         self.poll_interval = args.poll_interval
         self.ribstate = RtrRIBState(self.sql, self.device)
         self.last_update = self.ribstate.updated
+
 
     def cleanup(self):
         pass
@@ -233,7 +235,10 @@ class EOMRtrRIBFetcher(EOMGenericPoller):
         """
         if now - self.last_update > self.poll_interval:
             # Start a fresh lookup
-            output = subprocess.check_output(["do_poll", "--device", self.device])
+            if self.realm:
+                output = subprocess.check_output(["do_poll", "--device", self.device, "--realm", self.realm])
+            else:
+                output = subprocess.check_output(["do_poll", "--device", self.device])
             #output = subprocess.check_output(["python", "-W ignore", "do_poll.py", "--device", self.device])
             #output = subprocess.check_output(["clogin", "-c 'show ip bgp'", self.device])
             #output = str('{"quagga.vm": {"show ip bgp": "BGP table version is 0, local router ID is 192.168.56.101\\r\\nStatus codes: s suppressed, d damped, h history, * valid, > best, i - internal,\\r\\n              r RIB-failure, S Stale, R Removed\\r\\nOrigin codes: i - IGP, e - EGP, ? - incomplete\\r\\n\\r\\n   Network          Next Hop            Metric LocPrf Weight Path\\r\\n*>i1.9.0.0/16       192.168.56.1            10      0      0 3257 4788 i\\r\\n*>i1.9.21.0/24      192.168.56.1                    0      0 7018 6453 4788 4788 i\\r\\n\\r\\nTotal number of prefixes 2\\r\\n"}}')

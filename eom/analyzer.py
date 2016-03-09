@@ -242,11 +242,12 @@ def rpki_server_spec(s):
 def rtr_rib_spec(s):
     """Define the format for the rtr-rib spec argument"""
     try:
-        device, poll_interval,reset = map(str, s.split(':'))
+        device, poll_interval,reset,realm = map(str, s.split(':'))
         n = argparse.Namespace()
         n.device = device
         n.poll_interval = int(poll_interval)
         n.reset_session = True if reset == 'Y' else False 
+        n.realm = realm
         return n
     except:
         raise argparse.ArgumentTypeError("Format must be device:poll_interval:reset")

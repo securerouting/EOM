@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 """ Fetch RIB information from routers.
 
@@ -14,7 +14,7 @@ The output is returned as a JSON representation of a dict structure,
 indexed on the device name and the command run.
 
 """
-from trigger import rancid,netdevices,cmds
+from trigger import rancid,netdevices,cmds,tacacsrc
 import argparse
 from pprint import pprint
 import json
@@ -37,6 +37,7 @@ class CommandWrapper():
         """
         self.command = 'show ip bgp'
         self.devicelist = []
+        self.realm = None
 
     def poll(self):
         """Poll device list for BGP RIB information.
@@ -51,7 +52,15 @@ class CommandWrapper():
         Returns:
             str: A JSON string representation of the results
         """
-        c = cmds.Commando(devices=self.devicelist, commands=[self.command], verbose=False)
+        # Fetch the creds or populate them if they don't exist
+        if self.realm:
+            credobj = tacacsrc.get_device_password(self.realm)
+            # Or just explicitly fetch them without trying to populate them:
+            # tcrc = tacacsrc.Tacacsrc()
+            # creds = tcrc.creds[realm]
+            c = cmds.Commando(devices=self.devicelist, commands=[self.command], verbose=False, creds=credobj)
+        else:
+            c = cmds.Commando(devices=self.devicelist, commands=[self.command], verbose=False)
         c.run()
         return (json.dumps(c.results))
 
@@ -75,7 +84,7 @@ class RancidCommandWrapper(CommandWrapper):
 
 class TriggerCommandWrapper(CommandWrapper):
     """Subclass for issuing router commands using Trigger"""
-    def __init__(self, devicenames):
+    def __init__(self, devicenames, realm):
         """constructor.
        
         Initialize the TriggerCommandWrapper object. Also convert the
@@ -85,6 +94,7 @@ class TriggerCommandWrapper(CommandWrapper):
             devicenames(list of strs): A list of device names
         """
         CommandWrapper.__init__(self, devicenames)
+        self.realm = realm
         nd = netdevices.NetDevices(production_only=False)
         for d in devicenames:
             self.devicelist.append(nd.find(d))
@@ -92,6 +102,7 @@ class TriggerCommandWrapper(CommandWrapper):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--device", action="append", help="Device to lookup", required=True)
+    parser.add_argument("--realm", help="Device credential realm")
     parser.add_argument("--mode", choices=['trigger', 'rancid'], default='trigger', help="Mode of lookup")
     parser.add_argument("--rancidroot", default=RANCID_ROOT, help="Path to rancid root")
     args = parser.parse_args()
@@ -99,7 +110,7 @@ if __name__ == "__main__":
     r = {}
     try:
         if args.mode == 'trigger':
-            c = TriggerCommandWrapper(args.device)
+            c = TriggerCommandWrapper(args.device, args.realm)
         else:
             c = RancidCommandWrapper(args.device)
         r = c.poll()
