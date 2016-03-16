@@ -9,9 +9,9 @@ import sys
 import time
 import logging
 import logging.handlers
-import argparse
 
-from eom.analyzer import eom_parse_args, EOMEngine
+from eom.argparser import eom_parse_args
+from eom.analyzer import EOMEngine
 
 class Formatter(logging.Formatter):
 
@@ -52,8 +52,7 @@ def setup_logging(args):
 def main():
     os.environ["TZ"] = "UTC"
     time.tzset()
-    parser = eom_parse_args(__doc__)
-    args = parser.parse_args()
+    args = eom_parse_args(__doc__)
 #    setup_logging(args)
     analyzer = EOMEngine(args)
     analyzer.run() 
