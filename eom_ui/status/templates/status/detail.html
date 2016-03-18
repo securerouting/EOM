@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>{% block title %}EOM Route Status{% endblock %}</h1>
+
+{% if routes %}
+    <table class='table'>
+        <thead>
+            <tr>
+            <th>Orig</th>
+            <th>Network</th>
+            <th>NextHop</th>
+            <th>Metric</th>
+            <th>LocPref</th>
+            <th>Weight</th>
+            <th>Path</th>
+            <th>Flags</th>
+            <th>Constraints</th>
+            </tr>
+        </thead>
+        <tbody>
+          {% for r in routes %}
+            <tr>
+            <td> {{ r.invalid }} </td>
+            <td> {{ r.pfx }} / {{ r.pfxlen }} </td>
+            <td> {{ r.nexthop }} </td>
+            <td> {{ r.metric }} </td>
+            <td> {{ r.locpref }} </td>
+            <td> {{ r.weight }} </td>
+            <td> {{ r.pathbutone }} {{ r.orig_asn }} </td>
+            <td> {{ r.route_orig }} </td>
+            <td> {{ r.rconstraint }} </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <h2>No routes found.</h2>
+{% endif %}
+
+{% endblock content %}
