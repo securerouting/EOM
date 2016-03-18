@@ -10,7 +10,7 @@ import os
 class EOMAggregator:
     """A RPKI-Rtr and RIB data aggregator."""
 
-    def __init__(self, dbfile="eom_default_db.sqlite"):
+    def __init__(self, dbfile="eom_default_db.sqlite", init_db=False):
         """Instantiate the data aggregator object.
 
         Args:
@@ -22,9 +22,10 @@ class EOMAggregator:
         missing = not os.path.exists(dbfile)
         self.sql = sqlite3.connect(dbfile, detect_types = sqlite3.PARSE_DECLTYPES)
         self.sql.text_factory = str
-        if missing:
+        if missing or init_db:
             self.init_rpki_rtr_tables()
             self.init_rib_tables()
+            self.init_analysis_tables()
 
     def get_sql_connection(self):
         """ Get an instance to the sql connection object.
@@ -124,6 +125,46 @@ class EOMAggregator:
                     route_orig      TEXT)''')
         self.sql.commit()
 
+    def init_analysis_tables(self):
+        """Initialize RIB database tables.
+       
+        Two tables are created. One stores the report ID associated with a
+        given run, while the second stores the contents of the report
+        indexed by the report id.
+
+        Args:
+            None
+        """
+        cur = self.sql.cursor()
+        cur.execute("PRAGMA foreign_keys = on")
+        cur.execute('''
+                CREATE TABLE report_index (
+                    report_id       INTEGER PRIMARY KEY NOT NULL,
+                    device          TEXT NOT NULL,
+                    timestamp       INTEGER NOT NULL)''')
+        cur.execute('''
+                CREATE TABLE report_detail (
+                    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+                    report_id       INTEGER NOT NULL
+                                    REFERENCES report_index(report_id)
+                                    ON DELETE CASCADE
+                                    ON UPDATE CASCADE,
+                    invalid         TEXT NOT NULL,
+                    status          TEXT NOT NULL,
+                    pfx             TEXT NOT NULL,
+                    pfxlen          TEXT NOT NULL,
+                    pfxstr_min      TEXT NOT NULL,
+                    pfxstr_max      TEXT NOT NULL,
+                    nexthop         TEXT NOT NULL,
+                    metric          TEXT NOT NULL,
+                    locpref         TEXT NOT NULL,
+                    weight          TEXT NOT NULL,
+                    pathbutone      TEXT NOT NULL,
+                    orig_asn        TEXT NOT NULL,
+                    route_orig      TEXT NOT NULL,
+                    rconstraint     TEXT NOT NULL)''')
+        self.sql.commit()
+
     def reset_rpki_rtr_session(self, host, port):
         """Reset an existing rpki-rtr session.
 
@@ -165,11 +206,12 @@ class EOMAggregator:
             None
         """
         cur = self.sql.cursor()
-        cur.execute("SELECT rtr_id, idx, asn, prefix, prefixlen, "
+        cur.execute("SELECT device, idx, asn, prefix, prefixlen, "
                     "   max_prefixlen, status, pfx, pfxlen, pfxstr_min, pfxstr_max, "
                     "   nexthop, metric, locpref, weight, pathbutone, orig_asn, route_orig "
                     "FROM prefix INNER JOIN rtr_rib ON "
-                    "   prefix_min <= pfxstr_min AND pfxstr_max <= prefix_max",())
+                    "   prefix_min <= pfxstr_min AND pfxstr_max <= prefix_max"
+                    "   INNER JOIN rtr_cache ON rtr_cache.rtr_id = rtr_rib.rtr_id" ,())
         return cur.fetchall()
 
     def get_covering(self, rtr_id, pfxstr_min, pfxstr_max):
@@ -190,3 +232,24 @@ class EOMAggregator:
                     "WHERE rtr_id = ? AND pfxstr_min <= ? AND pfxstr_max >= ?",
                     (rtr_id, pfxstr_min, pfxstr_max))
         return cur.fetchall()
+
+    def store_analysis_results(self, data, ts):
+        """Store the result into the database"""
+        cur = self.sql.cursor()
+        for rtr in data:
+            cur.execute("INSERT INTO report_index (device, timestamp) VALUES (?, ?)", (rtr, ts))
+            report_id = cur.lastrowid
+            for (i, v) in sorted(data[rtr].items(), key=lambda x:int(x[0])):
+                args = [report_id]
+                args.append(v[0])
+                args.extend(v[1])
+                if v[2]:
+                    args.append(str(v[2]))
+                else:
+                    args.append("")
+                cur.execute("INSERT INTO report_detail (report_id, invalid, status, pfx, pfxlen, "
+                            "pfxstr_min, pfxstr_max, nexthop, metric, locpref, weight, "
+                            "pathbutone, orig_asn, route_orig, rconstraint) "
+                            "VALUES (?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?)", 
+                            (args))
+        self.sql.commit()

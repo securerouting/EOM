@@ -85,6 +85,7 @@ def eom_setup_parser(desc):
     parser = argparse.ArgumentParser(description = desc)
     parser.add_argument("--config_file", help = "Config file for EOM.", type=argparse.FileType('r'))
     parser.add_argument("--sql-database", help = "filename for sqlite3 database of EOM state")
+    parser.add_argument("--init-db", help = "Initialize the DB tables", action='store_true')
     parser.add_argument("--rpki-serv", help="RPKI server spec", action="append", type=rpki_server_spec())
     parser.add_argument("--rtr-rib", help="Router spec", action="append", type=rtr_rib_spec())
     parser.add_argument("--debug", action = "store_true", help = "debugging mode")
@@ -107,13 +108,23 @@ def eom_parse_args(desc):
 
         # Use rpki_serv from file if value not provided in CL
         if 'rpki_serv' in yamldata and not arg_dict['rpki_serv']:
-            rpki_serv_args = rpki_server_spec.sanitize(yamldata['rpki_serv'])
-            args.rpki_serv = [rpki_serv_args]
+            rpki_serv_args = []
+            if isinstance(yamldata['rpki_serv'], list):
+                for r in yamldata['rpki_serv']:
+                    rpki_serv_args.append(rpki_server_spec.sanitize(r))
+            else:
+                rpki_serv_args.append(rpki_server_spec.sanitize(yamldata['rpki_serv']))
+            args.rpki_serv = rpki_serv_args
 
         # Use rtr_rib from file if value not provided in CL
         if 'rtr_rib' in yamldata and not arg_dict['rtr_rib']:
-            rtr_rib_args = rtr_rib_spec.sanitize(yamldata['rtr_rib'])
-            args.rtr_rib = [rtr_rib_args]
+            rtr_rib_args = []
+            if isinstance(yamldata['rtr_rib'], list):
+                for r in yamldata['rtr_rib']:
+                    rtr_rib_args.append(rtr_rib_spec.sanitize(r))
+            else:
+                rtr_rib_args.append(rtr_rib_spec.sanitize(yamldata['rtr_rib']))
+            args.rtr_rib = rtr_rib_args
 
         # Use sql_database from file if value not provided in CL
         if 'sql_database' in yamldata and not arg_dict['sql_database']:

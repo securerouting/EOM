@@ -29,7 +29,7 @@ class EOMReporter:
                str(locpref) + "\t" + str(weight) + "\t" + \
                pathbutone + " " + str(orig_asn) + "\t" + route_orig
 
-    def show(self, data):
+    def show(self, data, ts):
         """Display data onto the User Interface
 
         Args:
@@ -41,7 +41,8 @@ class EOMReporter:
 
         """
         for rtr in data:
-            print "\nRouter: " + str(rtr)
+            print "\nTest run at: " + str(ts)
+            print "Router: " + str(rtr) 
             print "   " + "\t" + "Network" + "   " + "\t" + "Next Hop" + \
                 "\t" + "Metric" + "\t" + "LocPrf" + "\t" + "Weight" + \
                 "\t" + "Path"
