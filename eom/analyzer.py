@@ -27,7 +27,7 @@ class EOMAnalyzer:
         self.aggregator = aggregator
         pass
 
-    def analyze(self):
+    def analyze(self, ts):
         """Extract data from database and analyze.
 
         Get the list of RIB entries and associated RPKI information to
@@ -46,7 +46,7 @@ class EOMAnalyzer:
         mismatch = defaultdict(dict)
 
         toprocess = self.aggregator.get_rpki_rib()
-        for (rtr_id, index, asn, prefix, prefixlen, max_prefixlen, 
+        for (device, index, asn, prefix, prefixlen, max_prefixlen, 
                 status, pfx, pfxlen, pfxstr_min, pfxstr_max, nexthop,
                 metric, locpref, weight, pathbutone, orig_asn,
                 route_orig) in toprocess:
@@ -59,34 +59,34 @@ class EOMAnalyzer:
             if pfxlen < prefixlen:
                 continue
 
-            if index in rib_good_info[rtr_id]:
+            if index in rib_good_info[device]:
                 continue
 
             if asn == orig_asn and pfxlen <= max_prefixlen:
-                if index in rib_bad_info[rtr_id]:
-                    del rib_bad_info[rtr_id][index]
-                if index in mismatch[rtr_id]:
-                    del mismatch[rtr_id][index]
-                rib_good_info[rtr_id][index] = rib_tup
+                if index in rib_bad_info[device]:
+                    del rib_bad_info[device][index]
+                if index in mismatch[device]:
+                    del mismatch[device][index]
+                rib_good_info[device][index] = rib_tup
             else:
-                rib_bad_info[rtr_id][index] = (pfxstr_min, pfxstr_max, rib_tup)
+                rib_bad_info[device][index] = (pfxstr_min, pfxstr_max, rib_tup)
                 rpkirtrpfxstr = prefix + "/" + "[" + str(prefixlen) + '-' + str(max_prefixlen) + "]"
-                if index in mismatch[rtr_id]:
-                    mismatch[rtr_id][index].append((asn, rpkirtrpfxstr))
-                    mismatch[rtr_id][index] = list(set(mismatch[rtr_id][index]))
+                if index in mismatch[device]:
+                    mismatch[device][index].append((asn, rpkirtrpfxstr))
+                    mismatch[device][index] = list(set(mismatch[device][index]))
                 else:
-                    mismatch[rtr_id][index] = [(asn, rpkirtrpfxstr)]
+                    mismatch[device][index] = [(asn, rpkirtrpfxstr)]
 
         # return all affected paths
         consolidated = defaultdict(dict)
         # Find all less-specific prefixes
         # XXX Needs to be optimized
-        for rtr_id in rib_bad_info:
-            for index in rib_bad_info[rtr_id]:
-                (pfxstr_min, pfxstr_max, rib_tup) = rib_bad_info[rtr_id][index]
+        for device in rib_bad_info:
+            for index in rib_bad_info[device]:
+                (pfxstr_min, pfxstr_max, rib_tup) = rib_bad_info[device][index]
                 # Add the invalid route to the consolidated list
-                consolidated[rtr_id][index] = ("I", rib_tup, mismatch[rtr_id][index])
-                covering = self.aggregator.get_covering(rtr_id, pfxstr_min, pfxstr_max)
+                consolidated[device][index] = ("I", rib_tup, mismatch[device][index])
+                covering = self.aggregator.get_covering(device, pfxstr_min, pfxstr_max)
                 # Add the covering routes to the consolidated list
                 for (idx, status, pfx, pfxlen, pfxstr_min, pfxstr_max, nexthop,
                      metric, locpref, weight, pathbutone, orig_asn,
@@ -94,12 +94,13 @@ class EOMAnalyzer:
                     rib_tup = (status, pfx, pfxlen, pfxstr_min,
                             pfxstr_max, nexthop, metric, locpref,
                             weight, pathbutone, orig_asn, route_orig)
-                    if idx in consolidated[rtr_id]:
+                    if idx in consolidated[device]:
                         continue
-                    elif idx in rib_good_info[rtr_id]:
-                        consolidated[rtr_id][idx] = ("V", rib_good_info[rtr_id][idx], [])
+                    elif idx in rib_good_info[device]:
+                        consolidated[device][idx] = ("V", rib_good_info[device][idx], [])
                     else:
-                        consolidated[rtr_id][idx] = ("-", rib_tup, [])
+                        consolidated[device][idx] = ("-", rib_tup, [])
+        self.aggregator.store_analysis_results(consolidated, ts)
         return consolidated
 
 
@@ -117,7 +118,7 @@ class EOMEngine:
                 rtr_rib provides a list of arguments for any router rib pollers
         """
         self.fetchers = []
-        self.aggregator = EOMAggregator(args.sql_database)
+        self.aggregator = EOMAggregator(args.sql_database, args.init_db)
         self.analyzer = EOMAnalyzer(self.aggregator)
         self.reporter = EOMReporter()
         self.continuous = args.continuous
@@ -203,8 +204,9 @@ class EOMEngine:
                     print "Waiting for " + str(remaining)
                     asyncore.loop(timeout = remaining, count = 1)
                 else:
-                    result = self.analyzer.analyze()
-                    self.reporter.show(result)
+                    ts = int(now)
+                    result = self.analyzer.analyze(ts)
+                    self.reporter.show(result, ts)
                     if not self.continuous:
                         break
                     print "sleeping for " + str(remaining)
