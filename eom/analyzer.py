@@ -70,12 +70,11 @@ class EOMAnalyzer:
                 rib_good_info[device][index] = rib_tup
             else:
                 rib_bad_info[device][index] = (pfxstr_min, pfxstr_max, rib_tup)
-                rpkirtrpfxstr = prefix + "/" + "[" + str(prefixlen) + '-' + str(max_prefixlen) + "]"
                 if index in mismatch[device]:
-                    mismatch[device][index].append((asn, rpkirtrpfxstr))
+                    mismatch[device][index].append((asn, prefix, prefixlen, max_prefixlen))
                     mismatch[device][index] = list(set(mismatch[device][index]))
                 else:
-                    mismatch[device][index] = [(asn, rpkirtrpfxstr)]
+                    mismatch[device][index] = [(asn, prefix, prefixlen, max_prefixlen)]
 
         # return all affected paths
         consolidated = defaultdict(dict)

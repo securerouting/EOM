@@ -170,7 +170,9 @@ class EOMAggregator:
                                     ON DELETE CASCADE
                                     ON UPDATE CASCADE,
                     asn             TEXT NOT NULL,
-                    prefix          TEXT NOT NULL)''')
+                    prefix          TEXT NOT NULL,
+                    prefixlen       INTEGER NOT NULL,
+                    max_prefixlen   INTEGER NOT NULL)''')
         self.sql.commit()
 
     def reset_rpki_rtr_session(self, host, port):
@@ -259,7 +261,8 @@ class EOMAggregator:
                 route_id = cur.lastrowid
                 if v[2]:
                     # should be a list of tuples of constraints that failed
-                    for (asn, prefix) in v[2]:
-                        cur.execute("INSERT INTO fconstraints (route_id, asn, prefix) "
-                                    "VALUES (?, ?, ?)", (route_id, asn, prefix))
+                    for (asn, prefix, prefixlen, max_prefixlen) in v[2]:
+                        cur.execute("INSERT INTO fconstraints (route_id, asn, prefix, prefixlen, max_prefixlen) "
+                                    "VALUES (?, ?, ?, ?, ?)", 
+                                    (route_id, asn, prefix, prefixlen, max_prefixlen))
         self.sql.commit()

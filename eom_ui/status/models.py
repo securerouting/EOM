@@ -117,10 +117,10 @@ class Fconstraints(models.Model):
     route_id = models.TextField()
     asn = models.TextField()
     prefix = models.TextField()
+    prefixlen = models.IntegerField()
+    max_prefixlen = models.IntegerField()
 
     class Meta:
         managed = False
         db_table = 'fconstraints'
-
-
 
