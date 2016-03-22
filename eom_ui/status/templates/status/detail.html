@@ -8,14 +8,16 @@
     <table class='table'>
         <thead>
             <tr>
-            <th>Orig</th>
+            <th>ROA Status</th>
             <th>Network</th>
             <th>NextHop</th>
             <th>Metric</th>
             <th>LocPref</th>
             <th>Weight</th>
             <th>Path</th>
+            <!--
             <th>Flags</th>
+            -->
             <th>Constraints</th>
             </tr>
         </thead>
@@ -29,7 +31,9 @@
             <td> {{ r.locpref }} </td>
             <td> {{ r.weight }} </td>
             <td> {{ r.path }} </td>
+            <!--
             <td> {{ r.route_orig }} </td>
+            -->
             <td>
                 <table class='table'>
                 {% for c in r.constraints %}
