@@ -144,7 +144,7 @@ class EOMAggregator:
                     timestamp       INTEGER NOT NULL)''')
         cur.execute('''
                 CREATE TABLE report_detail (
-                    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+                    route_id        INTEGER PRIMARY KEY AUTOINCREMENT,
                     report_id       INTEGER NOT NULL
                                     REFERENCES report_index(report_id)
                                     ON DELETE CASCADE
@@ -161,8 +161,16 @@ class EOMAggregator:
                     weight          TEXT NOT NULL,
                     pathbutone      TEXT NOT NULL,
                     orig_asn        TEXT NOT NULL,
-                    route_orig      TEXT NOT NULL,
-                    rconstraint     TEXT NOT NULL)''')
+                    route_orig      TEXT NOT NULL)''')
+        cur.execute('''
+                CREATE TABLE fconstraints (
+                    fcons_id        INTEGER PRIMARY KEY AUTOINCREMENT,
+                    route_id        TEXT NOT NULL
+                                    REFERENCES report_detail(route_id)
+                                    ON DELETE CASCADE
+                                    ON UPDATE CASCADE,
+                    asn             TEXT NOT NULL,
+                    prefix          TEXT NOT NULL)''')
         self.sql.commit()
 
     def reset_rpki_rtr_session(self, host, port):
@@ -243,13 +251,15 @@ class EOMAggregator:
                 args = [report_id]
                 args.append(v[0])
                 args.extend(v[1])
-                if v[2]:
-                    args.append(str(v[2]))
-                else:
-                    args.append("")
                 cur.execute("INSERT INTO report_detail (report_id, invalid, status, pfx, pfxlen, "
                             "pfxstr_min, pfxstr_max, nexthop, metric, locpref, weight, "
-                            "pathbutone, orig_asn, route_orig, rconstraint) "
-                            "VALUES (?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?)", 
+                            "pathbutone, orig_asn, route_orig) "
+                            "VALUES (?, ?,?,?,?,?,?,?,?,?,?,?,?,?)", 
                             (args))
+                route_id = cur.lastrowid
+                if v[2]:
+                    # should be a list of tuples of constraints that failed
+                    for (asn, prefix) in v[2]:
+                        cur.execute("INSERT INTO fconstraints (route_id, asn, prefix) "
+                                    "VALUES (?, ?, ?)", (route_id, asn, prefix))
         self.sql.commit()
