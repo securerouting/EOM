@@ -28,7 +28,6 @@ class Cache(models.Model):
         managed = False
         db_table = 'cache'
 
-
 class Prefix(models.Model):
     cache_id = models.IntegerField()
     asn = models.IntegerField()
@@ -41,39 +40,6 @@ class Prefix(models.Model):
     class Meta:
         managed = False
         db_table = 'prefix'
-
-
-class ReportDetail(models.Model):
-    report_id = models.IntegerField()
-    invalid = models.TextField()
-    status = models.TextField()
-    pfx = models.TextField()
-    pfxlen = models.TextField()
-    pfxstr_min = models.TextField()
-    pfxstr_max = models.TextField()
-    nexthop = models.TextField()
-    metric = models.TextField()
-    locpref = models.TextField()
-    weight = models.TextField()
-    pathbutone = models.TextField()
-    orig_asn = models.TextField()
-    route_orig = models.TextField()
-    rconstraint = models.TextField()
-
-    class Meta:
-        managed = False
-        db_table = 'report_detail'
-
-
-class ReportIndex(models.Model):
-    report_id = models.IntegerField(primary_key=True)
-    device = models.TextField()
-    timestamp = models.IntegerField()
-
-    class Meta:
-        managed = False
-        db_table = 'report_index'
-
 
 class Routerkey(models.Model):
     cache_id = models.IntegerField()
@@ -114,3 +80,47 @@ class RtrRib(models.Model):
     class Meta:
         managed = False
         db_table = 'rtr_rib'
+
+class ReportIndex(models.Model):
+    report_id = models.IntegerField(primary_key=True)
+    device = models.TextField()
+    timestamp = models.IntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'report_index'
+
+
+class ReportDetail(models.Model):
+    route_id = models.AutoField(primary_key=True)
+    report_id = models.IntegerField()
+    invalid = models.TextField()
+    status = models.TextField()
+    pfx = models.TextField()
+    pfxlen = models.TextField()
+    pfxstr_min = models.TextField()
+    pfxstr_max = models.TextField()
+    nexthop = models.TextField()
+    metric = models.TextField()
+    locpref = models.TextField()
+    weight = models.TextField()
+    pathbutone = models.TextField()
+    orig_asn = models.TextField()
+    route_orig = models.TextField()
+
+    class Meta:
+        managed = False
+        db_table = 'report_detail'
+
+class Fconstraints(models.Model):
+    fcons_id = models.AutoField(primary_key=True)
+    route_id = models.TextField()
+    asn = models.TextField()
+    prefix = models.TextField()
+
+    class Meta:
+        managed = False
+        db_table = 'fconstraints'
+
+
+
