@@ -44,6 +44,7 @@ class EOMAnalyzer:
         rib_good_info = defaultdict(dict)
         rib_bad_info = defaultdict(dict)
         mismatch = defaultdict(dict)
+        matched = defaultdict(dict)
 
         toprocess = self.aggregator.get_rpki_rib()
         for (device, index, asn, prefix, prefixlen, max_prefixlen, 
@@ -59,16 +60,18 @@ class EOMAnalyzer:
             if pfxlen < prefixlen:
                 continue
 
-            if index in rib_good_info[device]:
-                continue
-
             if asn == orig_asn and pfxlen <= max_prefixlen:
                 if index in rib_bad_info[device]:
                     del rib_bad_info[device][index]
                 if index in mismatch[device]:
                     del mismatch[device][index]
                 rib_good_info[device][index] = rib_tup
-            else:
+                if index in matched[device]:
+                    matched[device][index].append((asn, prefix, prefixlen, max_prefixlen))
+                    matched[device][index] = list(set(matched[device][index]))
+                else:
+                    matched[device][index] = [(asn, prefix, prefixlen, max_prefixlen)]
+            elif index not in rib_good_info[device]:
                 rib_bad_info[device][index] = (pfxstr_min, pfxstr_max, rib_tup)
                 if index in mismatch[device]:
                     mismatch[device][index].append((asn, prefix, prefixlen, max_prefixlen))
@@ -96,7 +99,7 @@ class EOMAnalyzer:
                     if idx in consolidated[device]:
                         continue
                     elif idx in rib_good_info[device]:
-                        consolidated[device][idx] = ("V", rib_good_info[device][idx], [])
+                        consolidated[device][idx] = ("V", rib_good_info[device][idx], matched[device][idx])
                     else:
                         consolidated[device][idx] = ("-", rib_tup, [])
         self.aggregator.store_analysis_results(consolidated, ts)
