@@ -5,20 +5,20 @@
 <h1>{% block title %}EOM Route Status{% endblock %}</h1>
 
 {% if routes %}
-    <table class='table'>
+    <table class='rtable'>
         <thead>
             <tr>
-            <th>ROA Status</th>
-            <th>Network</th>
-            <th>NextHop</th>
-            <th>Metric</th>
-            <th>LocPref</th>
-            <th>Weight</th>
-            <th>Path</th>
+            <th class="row-status row-header">ROA Status</th>
+            <th class="row-network row-header">Network</th>
+            <th class="row-nexthop row-header">NextHop</th>
+            <th class="row-metric row-header">Met</th>
+            <th class="row-locpref row-header">Loc</th>
+            <th class="row-weight row-header">Wt</th>
+            <th class="row-path row-header">Path</th>
             <!--
             <th>Flags</th>
             -->
-            <th>Constraints</th>
+            <th class="constraints">Constraints</th>
             </tr>
         </thead>
         <tbody>
@@ -37,7 +37,14 @@
             <td>
                 <table class='table'>
                 {% for c in r.constraints %}
-                <tr> <td> AS:{{ c.0 }} Prefix:{{ c.1 }} Range:[{{ c.2 }}-{{ c.3 }}] </td> </tr>
+                <!--
+                    <tr> <td> AS:{{ c.0 }} Prefix:{{ c.1 }} Range:[{{ c.2 }}-{{ c.3 }}] </td> </tr>
+                -->
+                <div id="cblock">
+                    <div>AS:{{ c.0 }}</div>
+                    <div>Prefix:{{ c.1 }}</div>
+                    <div>Range:[{{ c.2 }}-{{ c.3 }}]</div>
+                </div>
                 {% endfor %}
                 </table>
             </td>
