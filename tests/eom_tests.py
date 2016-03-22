@@ -116,7 +116,8 @@ class MapResourceTests(unittest.TestCase):
         t.add_vrp(1, 42, '10.0.0.0', 16, 16)
         t.add_rib_entry(1, 1, '10.0.0.0', 16, [1, 2, 42], '192.168.1.1')
         t.stage()
-        badroutes = analyzer.analyze()
+        ts = Timestamp.now()
+        badroutes = analyzer.analyze(ts)
         self.assertFalse(badroutes) 
 
     def test_good_range(self):
@@ -125,7 +126,8 @@ class MapResourceTests(unittest.TestCase):
         t.add_vrp(1, 42, '10.0.0.0', 12, 16)
         t.add_rib_entry(1, 1, '10.0.0.0', 16, [1, 2, 42], '192.168.1.1')
         t.stage()
-        badroutes = analyzer.analyze()
+        ts = Timestamp.now()
+        badroutes = analyzer.analyze(ts)
         self.assertFalse(badroutes) 
 
     def test_good_unknown(self):
@@ -134,7 +136,8 @@ class MapResourceTests(unittest.TestCase):
         t.add_vrp(1, 42, '10.0.0.0', 18, 20)
         t.add_rib_entry(1, 1, '10.0.0.0', 16, [1, 2, 42], '192.168.1.1')
         t.stage()
-        badroutes = analyzer.analyze()
+        ts = Timestamp.now()
+        badroutes = analyzer.analyze(ts)
         self.assertFalse(badroutes) 
 
     def test_bad_origin(self):
@@ -143,8 +146,9 @@ class MapResourceTests(unittest.TestCase):
         t.add_vrp(1, 42, '10.0.0.0', 16, 24)
         t.add_rib_entry(1, 1, '10.0.0.0', 16, [1, 2, 666], '192.168.1.1')
         t.stage()
-        badroutes = analyzer.analyze()
-        EOMReporter().show(badroutes)
+        ts = Timestamp.now()
+        badroutes = analyzer.analyze(ts)
+        EOMReporter().show(badroutes, ts)
         self.assertTrue(badroutes) 
 
     def test_bad_too_long(self):
@@ -153,8 +157,9 @@ class MapResourceTests(unittest.TestCase):
         t.add_vrp(1, 42, '10.0.0.0', 8, 12)
         t.add_rib_entry(1, 1, '10.0.0.0', 16, [1, 2, 42], '192.168.1.1')
         t.stage()
-        badroutes = analyzer.analyze()
-        EOMReporter().show(badroutes)
+        ts = Timestamp.now()
+        badroutes = analyzer.analyze(ts)
+        EOMReporter().show(badroutes, ts)
         self.assertTrue(badroutes) 
 
     def test_multiple_match1(self):
@@ -164,7 +169,8 @@ class MapResourceTests(unittest.TestCase):
         t.add_vrp(1, 42, '10.0.0.0', 16, 20)
         t.add_rib_entry(1, 1, '10.0.0.0', 24, [1, 2, 6], '192.168.1.1')
         t.stage()
-        badroutes = analyzer.analyze()
+        ts = Timestamp.now()
+        badroutes = analyzer.analyze(ts)
         self.assertFalse(badroutes) 
 
     def test_multiple_match2(self):
@@ -174,7 +180,8 @@ class MapResourceTests(unittest.TestCase):
         t.add_vrp(1, 42, '10.0.0.0', 16, 20)
         t.add_rib_entry(1, 1, '10.0.0.0', 16, [1, 2, 42], '192.168.1.1')
         t.stage()
-        badroutes = analyzer.analyze()
+        ts = Timestamp.now()
+        badroutes = analyzer.analyze(ts)
         self.assertFalse(badroutes) 
 
     def test_multiple_mismatch_asn(self):
@@ -184,8 +191,9 @@ class MapResourceTests(unittest.TestCase):
         t.add_vrp(1, 42, '10.0.0.0', 16, 20)
         t.add_rib_entry(1, 1, '10.0.0.0', 22, [1, 2, 42], '192.168.1.1')
         t.stage()
-        badroutes = analyzer.analyze()
-        EOMReporter().show(badroutes)
+        ts = Timestamp.now()
+        badroutes = analyzer.analyze(ts)
+        EOMReporter().show(badroutes, ts)
         self.assertTrue(badroutes) 
 
     def test_multiple_mismatch_len(self):
@@ -195,8 +203,9 @@ class MapResourceTests(unittest.TestCase):
         t.add_vrp(1, 42, '10.0.0.0', 16, 20)
         t.add_rib_entry(1, 1, '10.0.0.0', 26, [1, 2, 6], '192.168.1.1')
         t.stage()
-        badroutes = analyzer.analyze()
-        EOMReporter().show(badroutes)
+        ts = Timestamp.now()
+        badroutes = analyzer.analyze(ts)
+        EOMReporter().show(badroutes, ts)
         self.assertTrue(badroutes) 
 
     def test_pretty(self):
@@ -209,8 +218,9 @@ class MapResourceTests(unittest.TestCase):
         t.add_rib_entry(1, 3, '10.0.0.0', 24, [1, 2, 6], '192.168.1.2')
         t.add_rib_entry(1, 4, '10.0.0.0', 26, [1, 2, 6], '192.168.1.3')
         t.stage()
-        badroutes = analyzer.analyze()
-        EOMReporter().show(badroutes)
+        ts = Timestamp.now()
+        badroutes = analyzer.analyze(ts)
+        EOMReporter().show(badroutes, ts)
         self.assertTrue(badroutes) 
 
 
