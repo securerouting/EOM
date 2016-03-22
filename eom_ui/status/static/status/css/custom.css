@@ -1,0 +1,52 @@
+/* https://css-tricks.com/fixing-tables-long-strings/ */
+
+h1 {
+    text-align:center;
+}
+
+#cblock {
+    padding: 15px 0 0 0;
+}
+
+.rtable {
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    vertical-align: middle 
+}
+
+.rtable td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.row-header {
+    text-align:center;
+}
+
+.row-status {
+      width: 5%;
+}
+.row-network {
+      width: 15%;
+}
+.row-nexthop {
+      width: 15%;
+}
+.row-metric {
+      width: 5%;
+}
+.row-locpref {
+      width: 5%;
+}
+.row-weight {
+      width: 5%;
+}
+.row-path {
+      width: 30%;
+}
+.row-constraints {
+      width: 20%;
+}
