@@ -8,7 +8,7 @@ h1 {
     padding: 15px 0 0 0;
 }
 
-.rtable {
+.eomtable {
     table-layout: fixed;
     width: 100%;
     border-collapse: collapse;
@@ -16,7 +16,7 @@ h1 {
     vertical-align: middle 
 }
 
-.rtable td {
+.eomtable td {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -25,6 +25,38 @@ h1 {
 .row-header {
     text-align:center;
 }
+
+/* Summary Table */
+
+.row-report-id {
+    width: 10%;
+}
+
+.row-device {
+    width: 25%;
+}
+
+.row-timestamp {
+    width: 25%;
+}
+
+.row-sum-tot {
+    width: 10%;
+}
+
+.row-sum-valid {
+    width: 10%;
+}
+
+.row-sum-invalid {
+    width: 10%;
+}
+
+.row-sum-unknown {
+    width: 10%;
+}
+
+/* Detail Table */
 
 .row-status {
       width: 5%;
@@ -50,3 +82,5 @@ h1 {
 .row-constraints {
       width: 20%;
 }
+
+
