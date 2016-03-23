@@ -86,6 +86,22 @@ class ReportIndex(models.Model):
     device = models.TextField()
     timestamp = models.IntegerField()
 
+    def _get_summary(self):
+        routes = ReportDetail.objects.filter(report_id=self.report_id)
+        tot = len(routes)
+        invalid = 0
+        valid = 0
+        unknown = 0
+        for r in routes:
+            if r.invalid == 'V':
+                valid += 1
+            elif r.invalid == 'I':
+                invalid += 1
+            else: 
+                unknown += 1 
+        return (tot, valid, invalid, unknown)
+    summary = property(_get_summary)
+
     class Meta:
         managed = False
         db_table = 'report_index'
