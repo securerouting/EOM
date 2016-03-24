@@ -60,8 +60,7 @@ WSGI_APPLICATION = 'eom_ui.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        #'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        'NAME': os.path.join('/Volumes/Secondary/tmp', 'eom_db.sqlite'),
+        'NAME': os.path.join(BASE_DIR, 'eom_db.sqlite3'),
     }
 }
 
