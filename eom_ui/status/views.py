@@ -4,6 +4,8 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from status.models import ReportIndex, ReportDetail, Fconstraints
 from django.db.models import F
+from django.contrib.syndication.views import Feed
+from django.core.urlresolvers import reverse
 
 def index(request):
     report_list = ReportIndex.objects.order_by('-report_id')
@@ -32,3 +34,22 @@ def detail(request, rep_id):
             r.constraints.append((c.asn, c.prefix, c.prefixlen, c.max_prefixlen))
     context = { 'routes': routes }
     return render(request, 'status/detail.html', context)
+
+
+# Provide an RSS Feed
+class LatestEntriesFeed(Feed):
+
+    title = "EOM latest reports"
+    link = "/status/"
+
+    def items(self):
+        return ReportIndex.objects.order_by('-report_id')[:5]
+
+    def item_title(self, item):
+        return "TS:%s" % item.timestamp
+
+    def item_description(self, item):
+        return "Device:%s Status:%i/%i/%i/%i"  % (item.device, item.summary[0], item.summary[1], item.summary[2], item.summary[3])
+
+    def item_link(self, item):
+        return reverse('status:detail', args=[item.report_id])
