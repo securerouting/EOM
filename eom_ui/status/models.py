@@ -11,7 +11,6 @@ from __future__ import unicode_literals
 
 from django.db import models
 
-
 class Cache(models.Model):
     cache_id = models.IntegerField(primary_key=True)
     host = models.TextField()
