@@ -186,6 +186,7 @@ class EOMAggregator:
             port (string): the rpki-rtr server port 
         """
         cur = self.sql.cursor()
+        cur.execute("PRAGMA foreign_keys = on")
         cur.execute("DELETE FROM cache WHERE host = ? and port = ?", (host, port))
         self.sql.commit()
 
@@ -200,6 +201,7 @@ class EOMAggregator:
 
         """
         cur = self.sql.cursor()
+        cur.execute("PRAGMA foreign_keys = on")
         cur.execute("DELETE FROM rtr_cache WHERE device = ?", (device, ))
         self.sql.commit()
 

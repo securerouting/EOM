@@ -131,12 +131,13 @@ class RtrRIBState:
             None
         """
         if rib:
-            print "Updating Database with new data."
+            print "Updating Database with new data for %s." % self.device
             #pprint(rib)
             cur = self.sql.cursor()
             cur.execute("SELECT rtr_id, device FROM rtr_cache WHERE device = ?", (self.device, ))
             try:
                 rtr_id, device = cur.fetchone()
+                cur.execute("PRAGMA foreign_keys = on")
                 cur.execute("DELETE FROM rtr_cache WHERE device = ?", (self.device, ))
                 raise TypeError # Simulate lookup failure case
             except TypeError:
