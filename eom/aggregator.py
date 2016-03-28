@@ -6,6 +6,8 @@ retrieved data into a persistent data store (database).
 
 import sqlite3
 import os
+import json
+import hashlib
 
 class EOMAggregator:
     """A RPKI-Rtr and RIB data aggregator."""
@@ -139,16 +141,15 @@ class EOMAggregator:
         cur.execute("PRAGMA foreign_keys = on")
         cur.execute('''
                 CREATE TABLE report_index (
-                    report_id       INTEGER PRIMARY KEY NOT NULL,
+                    report_id       INTEGER PRIMARY KEY AUTOINCREMENT,
+                    report_hash     TEXT NOT NULL,
                     device          TEXT NOT NULL,
                     timestamp       INTEGER NOT NULL)''')
         cur.execute('''
                 CREATE TABLE report_detail (
                     route_id        INTEGER PRIMARY KEY AUTOINCREMENT,
-                    report_id       INTEGER NOT NULL
-                                    REFERENCES report_index(report_id)
-                                    ON DELETE CASCADE
-                                    ON UPDATE CASCADE,
+                    report_hash     TEXT NOT NULL
+                                    REFERENCES report_index(report_hash),
                     invalid         TEXT NOT NULL,
                     status          TEXT NOT NULL,
                     pfx             TEXT NOT NULL,
@@ -166,9 +167,7 @@ class EOMAggregator:
                 CREATE TABLE fconstraints (
                     fcons_id        INTEGER PRIMARY KEY AUTOINCREMENT,
                     route_id        TEXT NOT NULL
-                                    REFERENCES report_detail(route_id)
-                                    ON DELETE CASCADE
-                                    ON UPDATE CASCADE,
+                                    REFERENCES report_detail(route_id),
                     asn             TEXT NOT NULL,
                     prefix          TEXT NOT NULL,
                     prefixlen       INTEGER NOT NULL,
@@ -218,7 +217,7 @@ class EOMAggregator:
             None
         """
         cur = self.sql.cursor()
-        cur.execute("SELECT device, idx, asn, prefix, prefixlen, "
+        cur.execute("SELECT DISTINCT device, idx, asn, prefix, prefixlen, "
                     "   max_prefixlen, status, pfx, pfxlen, pfxstr_min, pfxstr_max, "
                     "   nexthop, metric, locpref, weight, pathbutone, orig_asn, route_orig "
                     "FROM prefix INNER JOIN rtr_rib ON "
@@ -245,26 +244,52 @@ class EOMAggregator:
                     (rtr_id, pfxstr_min, pfxstr_max))
         return cur.fetchall()
 
+
+    def get_report_hash(self, consolidated):
+        """Get a hash value that corresponds to the consolidated routes
+           
+        The consolidated routes are structured as a dict. The keys in
+        the dict are the index values of the routes. The values against
+        each key is a tuple with three values
+
+        val1: valid invalid unknown status ('V'/'I'/'-')
+        val2: RIB tuple with the following fields 
+                (status, pfx, pfxlen, pfxstr_min, pfxstr_max, nexthop, 
+                 metric, locpref, weight, pathbutone, orig_asn, route_orig)
+        val3: A list of tuples that reflect ROA constraints
+                [(asn, prefix, prefixlen, max_prefixlen)...]
+        """
+        jsonstr = json.dumps(consolidated, sort_keys=True)
+        hashobj = hashlib.sha1(jsonstr)
+        hexval = hashobj.hexdigest()
+        return hexval 
+
     def store_analysis_results(self, data, ts):
         """Store the result into the database"""
         cur = self.sql.cursor()
         for rtr in data:
-            cur.execute("INSERT INTO report_index (device, timestamp) VALUES (?, ?)", (rtr, ts))
+            report_hash = self.get_report_hash(data[rtr])
+            cur.execute("INSERT INTO report_index (report_hash, device, timestamp) VALUES (?, ?, ?)", (report_hash, rtr, ts))
             report_id = cur.lastrowid
-            for (i, v) in sorted(data[rtr].items(), key=lambda x:int(x[0])):
-                args = [report_id]
-                args.append(v[0])
-                args.extend(v[1])
-                cur.execute("INSERT INTO report_detail (report_id, invalid, status, pfx, pfxlen, "
-                            "pfxstr_min, pfxstr_max, nexthop, metric, locpref, weight, "
-                            "pathbutone, orig_asn, route_orig) "
-                            "VALUES (?, ?,?,?,?,?,?,?,?,?,?,?,?,?)", 
-                            (args))
-                route_id = cur.lastrowid
-                if v[2]:
-                    # should be a list of tuples of constraints that failed
-                    for (asn, prefix, prefixlen, max_prefixlen) in v[2]:
-                        cur.execute("INSERT INTO fconstraints (route_id, asn, prefix, prefixlen, max_prefixlen) "
-                                    "VALUES (?, ?, ?, ?, ?)", 
-                                    (route_id, asn, prefix, prefixlen, max_prefixlen))
+            # Check if the report_hash already exists 
+            # if not, then add the route entries
+            cur.execute("SELECT route_id FROM report_detail WHERE report_hash = ?", (report_hash,))
+            rdata = cur.fetchone()
+            if rdata is None:
+                for (i, v) in sorted(data[rtr].items(), key=lambda x:int(x[0])):
+                    args = [report_hash]
+                    args.append(v[0])
+                    args.extend(v[1])
+                    cur.execute("INSERT INTO report_detail (report_hash, invalid, status, pfx, pfxlen, "
+                                "pfxstr_min, pfxstr_max, nexthop, metric, locpref, weight, "
+                                "pathbutone, orig_asn, route_orig) "
+                                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)", 
+                                (args))
+                    route_id = cur.lastrowid
+                    if v[2]:
+                        # should be a list of tuples of constraints that failed
+                        for (asn, prefix, prefixlen, max_prefixlen) in v[2]:
+                            cur.execute("INSERT INTO fconstraints (route_id, asn, prefix, prefixlen, max_prefixlen) "
+                                        "VALUES (?, ?, ?, ?, ?)", 
+                                        (route_id, asn, prefix, prefixlen, max_prefixlen))
         self.sql.commit()
