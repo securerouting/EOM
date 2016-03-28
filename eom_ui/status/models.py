@@ -81,12 +81,13 @@ class RtrRib(models.Model):
         db_table = 'rtr_rib'
 
 class ReportIndex(models.Model):
-    report_id = models.IntegerField(primary_key=True)
+    report_id = models.AutoField(primary_key=True)
+    report_hash = models.TextField()
     device = models.TextField()
     timestamp = models.IntegerField()
 
     def _get_summary(self):
-        routes = ReportDetail.objects.filter(report_id=self.report_id)
+        routes = ReportDetail.objects.filter(report_hash=self.report_hash)
         tot = len(routes)
         invalid = 0
         valid = 0
@@ -108,7 +109,7 @@ class ReportIndex(models.Model):
 
 class ReportDetail(models.Model):
     route_id = models.AutoField(primary_key=True)
-    report_id = models.IntegerField()
+    report_hash = models.TextField()
     invalid = models.TextField()
     status = models.TextField()
     pfx = models.TextField()
