@@ -79,7 +79,6 @@ class EOMRPKIRtrCli(EOMGenericPoller):
         # Find how long we must wait 
         timer = self.client.retry if (now >= self.client.updated + self.client.refresh) else self.client.refresh
         wakeup = max(now, Timestamp(max(self.polled, self.client.updated) + timer))
-        remaining = wakeup - now
         # Find if we're still waiting for data to arrive
         if self.client.updated < self.polled:
             pending = True
