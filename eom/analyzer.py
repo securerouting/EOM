@@ -59,7 +59,7 @@ class EOMAnalyzer:
             # Create a RIB entry tuple
             rib_tup = (status, pfx, pfxlen, pfxstr_min, pfxstr_max, nexthop,
                        metric, locpref, weight, pathbutone, orig_asn, route_orig)
-
+            rpki_info = (asn, prefix, prefixlen, max_prefixlen)
             if asn == orig_asn and pfxlen <= max_prefixlen:
                 if index in rib_bad_info[device]:
                     del rib_bad_info[device][index]
@@ -67,17 +67,17 @@ class EOMAnalyzer:
                     del mismatch[device][index]
                 rib_good_info[device][index] = rib_tup
                 if index in matched[device]:
-                    matched[device][index].append((asn, prefix, prefixlen, max_prefixlen))
+                    matched[device][index].append(rpki_info)
                     matched[device][index] = list(set(matched[device][index]))
                 else:
-                    matched[device][index] = [(asn, prefix, prefixlen, max_prefixlen)]
+                    matched[device][index] = [rpki_info]
             elif index not in rib_good_info[device]:
                 rib_bad_info[device][index] = (pfxstr_min, pfxstr_max, rib_tup)
                 if index in mismatch[device]:
-                    mismatch[device][index].append((asn, prefix, prefixlen, max_prefixlen))
+                    mismatch[device][index].append(rpki_info)
                     mismatch[device][index] = list(set(mismatch[device][index]))
                 else:
-                    mismatch[device][index] = [(asn, prefix, prefixlen, max_prefixlen)]
+                    mismatch[device][index] = [rpki_info]
 
         # return all affected paths
         consolidated = defaultdict(dict)
