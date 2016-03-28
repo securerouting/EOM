@@ -52,13 +52,13 @@ class EOMAnalyzer:
                 metric, locpref, weight, pathbutone, orig_asn,
                 route_orig) in toprocess:
             
-            # Create a RIB entry tuple
-            rib_tup = (status, pfx, pfxlen, pfxstr_min, pfxstr_max, nexthop,
-                       metric, locpref, weight, pathbutone, orig_asn, route_orig)
-
             # The RPKI prefix must contain the advertised prefix
             if pfxlen < prefixlen:
                 continue
+
+            # Create a RIB entry tuple
+            rib_tup = (status, pfx, pfxlen, pfxstr_min, pfxstr_max, nexthop,
+                       metric, locpref, weight, pathbutone, orig_asn, route_orig)
 
             if asn == orig_asn and pfxlen <= max_prefixlen:
                 if index in rib_bad_info[device]:
@@ -93,14 +93,14 @@ class EOMAnalyzer:
                 for (idx, status, pfx, pfxlen, pfxstr_min, pfxstr_max, nexthop,
                      metric, locpref, weight, pathbutone, orig_asn,
                      route_orig) in covering:
-                    rib_tup = (status, pfx, pfxlen, pfxstr_min,
-                            pfxstr_max, nexthop, metric, locpref,
-                            weight, pathbutone, orig_asn, route_orig)
                     if idx in consolidated[device]:
                         continue
                     elif idx in rib_good_info[device]:
                         consolidated[device][idx] = ("V", rib_good_info[device][idx], matched[device][idx])
                     else:
+                        rib_tup = (status, pfx, pfxlen, pfxstr_min,
+                                   pfxstr_max, nexthop, metric, locpref,
+                                   weight, pathbutone, orig_asn, route_orig)
                         consolidated[device][idx] = ("-", rib_tup, [])
         self.aggregator.store_analysis_results(consolidated, ts)
         return consolidated
