@@ -1,6 +1,6 @@
 /* https://css-tricks.com/fixing-tables-long-strings/ */
 
-h1 {
+h2 {
     text-align:center;
 }
 
@@ -23,7 +23,7 @@ h1 {
 }
 
 .row-header {
-    text-align:center;
+/*    text-align:center; */
 }
 
 /* Summary Table */
@@ -59,7 +59,7 @@ h1 {
 /* Detail Table */
 
 .row-status {
-      width: 5%;
+      width: 4%;
 }
 .row-network {
       width: 15%;
@@ -68,16 +68,19 @@ h1 {
       width: 15%;
 }
 .row-metric {
-      width: 5%;
+      width: 4%;
 }
 .row-locpref {
-      width: 5%;
+      width: 4%;
 }
 .row-weight {
-      width: 5%;
+      width: 4%;
+}
+.row-origin {
+      width: 10%;
 }
 .row-path {
-      width: 30%;
+      width: 20%;
 }
 .row-constraints {
       width: 20%;
