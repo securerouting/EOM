@@ -2,18 +2,19 @@
 
 {% block content %}
 
-<h1>{% block title %}EOM Route Status{% endblock %}</h1>
+<h2>{% block title %}EOM Route Status{% endblock %}</h2>
 
 {% if routes %}
     <table class='eomtable'>
         <thead>
             <tr>
-            <th class="row-status row-header">ROA Status</th>
+            <th class="row-status row-header">ROA</th>
             <th class="row-network row-header">Network</th>
             <th class="row-nexthop row-header">NextHop</th>
-            <th class="row-metric row-header">Met</th>
-            <th class="row-locpref row-header">Loc</th>
-            <th class="row-weight row-header">Wt</th>
+            <th class="row-metric row-header">M</th>
+            <th class="row-locpref row-header">L</th>
+            <th class="row-weight row-header">W</th>
+            <th class="row-origin row-header">Origin</th>
             <th class="row-path row-header">Path</th>
             <!--
             <th>Flags</th>
@@ -30,6 +31,7 @@
             <td> {{ r.metric }} </td>
             <td> {{ r.locpref }} </td>
             <td> {{ r.weight }} </td>
+            <td> {{ r.orig_asn }} </td>
             <td> {{ r.path }} </td>
             <!--
             <td> {{ r.route_orig }} </td>
