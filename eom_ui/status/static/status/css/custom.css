@@ -87,4 +87,10 @@ h2 {
       width: 25%;
 }
 
+.stale-data {
+  background-color: #FFFF00;
+}
 
+.fresh-data {
+  background-color: #00FF00;
+}

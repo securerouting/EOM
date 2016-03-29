@@ -33,6 +33,11 @@ class Cache(models.Model):
         return datetime.datetime.fromtimestamp(self.updated).strftime('%Y-%m-%d %H:%M:%S')
     updated_str = property(_get_updated_timestr)
 
+    def _get_age(self):
+        now = int(datetime.datetime.now())
+        return now - self.updated
+    age = property(_get_age) 
+
     class Meta:
         managed = False
         db_table = 'cache'
@@ -75,6 +80,11 @@ class RtrCache(models.Model):
     def _get_rtrupdt_timestr(self):
         return datetime.datetime.fromtimestamp(self.rtrupdt).strftime('%Y-%m-%d %H:%M:%S')
     rtrupdt_str = property(_get_rtrupdt_timestr)
+
+    def _get_age(self):
+        now = int(datetime.datetime.now())
+        return now - self.updated
+    age = property(_get_age) 
 
     class Meta:
         managed = False
