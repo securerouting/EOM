@@ -105,6 +105,7 @@ class EOMAggregator:
                 CREATE TABLE rtr_cache (
                     rtr_id          INTEGER PRIMARY KEY NOT NULL,
                     device          TEXT NOT NULL,
+                    rtrupdt         INTEGER,
                     UNIQUE          (device))''')
         cur.execute('''
                 CREATE TABLE rtr_rib (
@@ -144,7 +145,8 @@ class EOMAggregator:
                     report_id       INTEGER PRIMARY KEY AUTOINCREMENT,
                     report_hash     TEXT NOT NULL,
                     device          TEXT NOT NULL,
-                    timestamp       INTEGER NOT NULL)''')
+                    timestamp       INTEGER NOT NULL,
+                    UNIQUE          (report_hash))''')
         cur.execute('''
                 CREATE TABLE report_detail (
                     route_id        INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -222,7 +224,7 @@ class EOMAggregator:
                     "   nexthop, metric, locpref, weight, pathbutone, orig_asn, route_orig "
                     "FROM prefix INNER JOIN rtr_rib ON "
                     "   prefix_min <= pfxstr_min AND pfxstr_max <= prefix_max"
-                    "   INNER JOIN rtr_cache ON rtr_cache.rtr_id = rtr_rib.rtr_id" ,())
+                    "   INNER JOIN rtr_cache ON rtr_cache.rtr_id = rtr_rib.rtr_id", ())
         return cur.fetchall()
 
     def get_covering(self, rtr_id, pfxstr_min, pfxstr_max):
