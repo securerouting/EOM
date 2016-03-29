@@ -2,7 +2,7 @@ from django.shortcuts import render
 
 # Create your views here.
 from django.http import HttpResponse
-from status.models import ReportIndex, ReportDetail, Fconstraints
+from status.models import Cache, RtrCache, ReportIndex, ReportDetail, Fconstraints
 from django.db.models import F
 from django.contrib.syndication.views import Feed
 from django.core.urlresolvers import reverse
@@ -21,16 +21,8 @@ def detail(request, rep_id):
             routes = ReportDetail.objects.filter(report_hash=ri.report_hash)
     # Prep fields before display
     for r in routes:
-        r.path = u'\u27a1'.join(r.pathbutone.split(' ')) + u'\u27a1' + r.orig_asn
-        if r.invalid == 'V':
-            # green check mark
-            r.invalid = u'\u2705'
-        elif r.invalid == 'I':
-            # red check mark
-            r.invalid = u'\u274c'
-        else:
-            # question mark
-            r.invalid = u'\u003f'
+        # Split the path into its constituent ASNs
+        r.pathlist = r.pathbutone.split(' ')
         # Now find all the contstraints
         r.constraints = []
         constraints = Fconstraints.objects.filter(route_id=r.route_id)
@@ -39,6 +31,11 @@ def detail(request, rep_id):
     context = { 'routes': routes }
     return render(request, 'status/detail.html', context)
 
+def devices(request):
+    rtr_list = RtrCache.objects.order_by('rtr_id')
+    rpki_server_list = Cache.objects.order_by('cache_id')
+    context = { 'rtr_list': rtr_list, 'rpki_server_list': rpki_server_list }
+    return render(request, 'status/devices.html', context)
 
 # Provide an RSS Feed
 class LatestEntriesFeed(Feed):

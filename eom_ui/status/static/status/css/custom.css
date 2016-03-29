@@ -75,3 +75,16 @@ h2 {
 }
 
 
+/* Detail Table */
+
+.row-rtr-device {
+      width: 50%;
+}
+.row-rtr-updt {
+      width: 25%;
+}
+.row-count {
+      width: 25%;
+}
+
+
