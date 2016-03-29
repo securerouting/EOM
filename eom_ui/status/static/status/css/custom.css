@@ -29,31 +29,19 @@ h2 {
 /* Summary Table */
 
 .row-report-id {
-    width: 10%;
+    width: 15%;
 }
 
 .row-device {
-    width: 25%;
+    width: 35%;
 }
 
 .row-timestamp {
     width: 25%;
 }
 
-.row-sum-tot {
-    width: 10%;
-}
-
-.row-sum-valid {
-    width: 10%;
-}
-
-.row-sum-invalid {
-    width: 10%;
-}
-
-.row-sum-unknown {
-    width: 10%;
+.row-invalid {
+    width: 25%;
 }
 
 /* Detail Table */
