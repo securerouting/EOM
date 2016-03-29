@@ -65,6 +65,7 @@ class EOMAggregator:
                     UNIQUE          (host, port))''')
         cur.execute('''
                 CREATE TABLE prefix (
+                    prefix_id       INTEGER PRIMARY KEY AUTOINCREMENT,
                     cache_id        INTEGER NOT NULL
                                     REFERENCES cache(cache_id)
                                     ON DELETE CASCADE
