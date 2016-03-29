@@ -53,7 +53,7 @@ class LatestEntriesFeed(Feed):
         return "TS:%s" % item.timestamp
 
     def item_description(self, item):
-        return "Device:%s Status:%i/%i/%i/%i"  % (item.device, item.summary[0], item.summary[1], item.summary[2], item.summary[3])
+        return "Device:%s Invalid:%i"  % (item.device, item.invalid)
 
     def item_link(self, item):
         return reverse('status:detail', args=[item.report_id])
