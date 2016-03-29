@@ -61,6 +61,8 @@ class EOMAnalyzer:
                        metric, locpref, weight, pathbutone, orig_asn, route_orig)
             rpki_info = (asn, prefix, prefixlen, max_prefixlen)
             if asn == orig_asn and pfxlen <= max_prefixlen:
+                # If we find a good match, remove the entry from our
+                # bad-info state
                 if index in rib_bad_info[device]:
                     del rib_bad_info[device][index]
                 if index in mismatch[device]:
@@ -72,6 +74,8 @@ class EOMAnalyzer:
                 else:
                     matched[device][index] = [rpki_info]
             elif index not in rib_good_info[device]:
+                # If the entry is not marked as good store it in our
+                # bad-info state
                 rib_bad_info[device][index] = (pfxstr_min, pfxstr_max, rib_tup)
                 if index in mismatch[device]:
                     mismatch[device][index].append(rpki_info)
