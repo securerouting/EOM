@@ -10,6 +10,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
+import datetime
 
 class Cache(models.Model):
     cache_id = models.IntegerField(primary_key=True)
@@ -23,11 +24,21 @@ class Cache(models.Model):
     retry = models.IntegerField(blank=True, null=True)
     expire = models.IntegerField(blank=True, null=True)
 
+    def _get_roa_count(self):
+        roas = Prefix.objects.filter(cache_id=self.cache_id)
+        return len(roas)
+    roa_count = property(_get_roa_count)
+
+    def _get_updated_timestr(self):
+        return datetime.datetime.fromtimestamp(self.updated).strftime('%Y-%m-%d %H:%M:%S')
+    updated_str = property(_get_updated_timestr)
+
     class Meta:
         managed = False
         db_table = 'cache'
 
 class Prefix(models.Model):
+    prefix_id = models.AutoField(primary_key=True)
     cache_id = models.IntegerField()
     asn = models.IntegerField()
     prefix = models.TextField()
@@ -54,7 +65,16 @@ class Routerkey(models.Model):
 class RtrCache(models.Model):
     rtr_id = models.IntegerField(primary_key=True)
     device = models.TextField(unique=True)
-    ribupdt = models.IntegerField(blank=True, null=True)
+    rtrupdt = models.IntegerField(blank=True, null=True)
+
+    def _get_rib_count(self):
+        routes = RtrRib.objects.filter(rtr_id=self.rtr_id)
+        return len(routes)
+    rib_count = property(_get_rib_count)
+
+    def _get_rtrupdt_timestr(self):
+        return datetime.datetime.fromtimestamp(self.rtrupdt).strftime('%Y-%m-%d %H:%M:%S')
+    rtrupdt_str = property(_get_rtrupdt_timestr)
 
     class Meta:
         managed = False
@@ -62,7 +82,7 @@ class RtrCache(models.Model):
 
 
 class RtrRib(models.Model):
-    rtr_id = models.IntegerField()
+    rtr_id = models.IntegerField(primary_key=True)
     idx = models.IntegerField()
     status = models.TextField(blank=True)
     pfx = models.TextField()
@@ -96,6 +116,10 @@ class ReportIndex(models.Model):
                 invalid += 1
         return invalid
     invalid = property(_get_invalid_count)
+
+    def _get_timestamp_timestr(self):
+        return datetime.datetime.fromtimestamp(self.timestamp).strftime('%Y-%m-%d %H:%M:%S')
+    timestamp_str = property(_get_timestamp_timestr)
 
     class Meta:
         managed = False
