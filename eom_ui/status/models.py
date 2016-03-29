@@ -87,21 +87,15 @@ class ReportIndex(models.Model):
     device = models.TextField()
     timestamp = models.IntegerField()
 
-    def _get_summary(self):
+    def _get_invalid_count(self):
         routes = ReportDetail.objects.filter(report_hash=self.report_hash)
         tot = len(routes)
         invalid = 0
-        valid = 0
-        unknown = 0
         for r in routes:
-            if r.invalid == 'V':
-                valid += 1
-            elif r.invalid == 'I':
+            if r.invalid == 'I':
                 invalid += 1
-            else: 
-                unknown += 1 
-        return (tot, valid, invalid, unknown)
-    summary = property(_get_summary)
+        return invalid
+    invalid = property(_get_invalid_count)
 
     class Meta:
         managed = False
