@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<h2>{% block title %}EOM Report List{% endblock %}</h2>
+<h2>{% block title %}EOM Error Report List{% endblock %}</h2>
 
 {% if report_list %}
     <table class='eomtable'>
@@ -11,10 +11,7 @@
             <th class="row-report-id"> Report Id </th>  
             <th class="row-device"> Device </th> 
             <th class="row-timestamp"> Timestamp </th>
-            <th class="row-sum-tot"> Total </th>
-            <th class="row-sum-valid"> Valid </th>
             <th class="row-sum-invalid"> Invalid </th>
-            <th class="row-sum-unknown"> Unkown </th>
             </tr>
         </thead>
         <tbody>
@@ -23,10 +20,7 @@
             <td><a href="{% url 'status:detail' r.report_id %}">{{ r.report_id }}</a></td>
             <td> {{ r.device }} </td>
             <td> {{ r.timestamp }} </td>
-            <td> {{ r.summary.0 }} </td>
-            <td> {{ r.summary.1 }} </td>
-            <td> {{ r.summary.2 }} </td>
-            <td> {{ r.summary.3 }} </td>
+            <td> {{ r.invalid }} </td>
             </tr>
           {% endfor %}
         </tbody>
