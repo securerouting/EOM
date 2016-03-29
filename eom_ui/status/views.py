@@ -15,9 +15,10 @@ def index(request):
 def detail(request, rep_id):
 #    routes = ReportDetail.objects.all()
     routes = []
-    ri = ReportIndex.objects.get(report_id=rep_id)
-    if ri:
-        routes = ReportDetail.objects.filter(report_hash=ri.report_hash)
+    if ReportIndex.objects.all():
+        ri = ReportIndex.objects.get(report_id=rep_id)
+        if ri:
+            routes = ReportDetail.objects.filter(report_hash=ri.report_hash)
     # Prep fields before display
     for r in routes:
         r.path = u'\u27a1'.join(r.pathbutone.split(' ')) + u'\u27a1' + r.orig_asn
