@@ -54,6 +54,7 @@ class Routerkey(models.Model):
 class RtrCache(models.Model):
     rtr_id = models.IntegerField(primary_key=True)
     device = models.TextField(unique=True)
+    ribupdt = models.IntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
