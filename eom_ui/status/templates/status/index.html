@@ -19,7 +19,7 @@
             <tr>
             <td><a href="{% url 'status:detail' r.report_id %}">{{ r.report_id }}</a></td>
             <td> {{ r.device }} </td>
-            <td> {{ r.timestamp }} </td>
+            <td> {{ r.timestamp_str }} </td>
             <td> {{ r.invalid }} </td>
             </tr>
           {% endfor %}
