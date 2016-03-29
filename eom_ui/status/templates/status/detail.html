@@ -25,15 +25,29 @@
         <tbody>
           {% for r in routes %}
             <tr>
-            <td> {{ r.invalid }} </td>
+            <td> 
+                {% if r.invalid == 'V' %}    
+                    &#x2705;
+                {% elif r.invalid == 'I' %} 
+                    &#x274c;
+                {% else %}
+                    &#x003f;
+                {% endif %}
+            </td>
             <td> {{ r.pfx }}/{{ r.pfxlen }} </td>
             <td> {{ r.nexthop }} </td>
             <td> {{ r.metric }} </td>
             <td> {{ r.locpref }} </td>
             <td> {{ r.weight }} </td>
             <td> {{ r.orig_asn }} </td>
-            <td> {{ r.path }} </td>
+            <td>
+                {% for a in r.pathlist %}
+                    {{ a }} &#x27a1; 
+                {% endfor %}
+                {{ r.orig_asn }}
+            </td>
             <!--
+            <td> {{ r.path }} </td>
             <td> {{ r.route_orig }} </td>
             -->
             <td>
