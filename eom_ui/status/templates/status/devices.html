@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>{% block title %}EOM Active Device List{% endblock %}</h2>
+
+<h3>Router List</h3>
+{% if rtr_list %}
+    <table class='eomtable'>
+        <thead>
+            <tr>
+            <th class="row-rtr-device"> Device </th> 
+            <th class="row-rtr-updt"> Last Update </th>
+            <th class="row-rib-count"> RIB Count </th>
+            </tr>
+        </thead>
+        <tbody>
+          {% for r in rtr_list %}
+            <tr>
+            <td> {{ r.device }} </td>
+            {% if r.age > 86400 %}
+                <td class="stale-data"> {{ r.rtrupdt_str }} </td>
+            {% else %}
+                <td class="fresh-data"> {{ r.rtrupdt_str }} </td>
+            {% endif %}
+            <td> {{ r.rib_count }} </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <h4>No router devices found.</h4>
+{% endif %}
+
+<h3>RPKI Router Server List</h3>
+{% if rpki_server_list %}
+    <table class='eomtable'>
+        <thead>
+            <tr>
+            <th class="row-rtr-device"> Device </th> 
+            <th class="row-rtr-updt"> Last Update </th>
+            <th class="row-count"> ROA Count </th>
+            </tr>
+        </thead>
+        <tbody>
+          {% for r in rpki_server_list %}
+            <tr>
+            <td> {{ r.host }}:{{ r.port }} </td>
+            {% if r.age > 86400 %}
+                <td class="stale-data"> {{ r.updated_str }} </td>
+            {% else %}
+                <td class="fresh-data"> {{ r.updated_str }} </td>
+            {% endif %}
+            <td> {{ r.roa_count }} </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <h4>No router devices found.</h4>
+{% endif %}
+
+{% endblock content %}
