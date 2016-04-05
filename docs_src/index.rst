@@ -13,7 +13,9 @@ Contents:
 
    introduction
    installation
-   examples
+   configuration
+   examples-cli
+   examples-gui
    eom
 
 

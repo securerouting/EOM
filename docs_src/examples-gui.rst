@@ -5,13 +5,13 @@ EOM GUI Examples
 The following examples assume that the Django app is running on
 127.0.0.1:8000
 
-Status Summary
---------------
+Status Summary: http:/127.0.0.1:8000/status
+--------------------------------------------
 
 This page gives a summary of the error reports availble.
 
 .. image:: /images/EOM-UI-Status.png
-   :height: 500px
+   :height: 200px
    :width: 1000px
 
 
@@ -28,8 +28,8 @@ invalid in the given report. The actual invalid routes can be viewed by
 looking at the detailed report.
 
 
-Detailed Report
----------------
+Detailed Report: http:/127.0.0.1:8000/status/<id>
+-------------------------------------------------
 
 This page provides details on the routes that were found to be invalid for
 the given device, any covering routes that were found to be valid or
@@ -37,12 +37,48 @@ unspecified, and the constraints that were either violated or satisfied
 for the given prefix and ASN combination. 
 
 .. image:: /images/EOM-UI-Status-Detail.png
-   :height: 500px
+   :height: 400px
    :width: 1000px
 
 The ROA status can be one of the following:
 
     ✅  : The ROA constraints matched 
+
     ❌  : The ROA constraints did not match
-    ?  : No ROA matching the give prefix was found 
+
+     ? : No ROA matching the give prefix was found 
+
+The Network, NextHop, Origin, and Path fields correspond to the
+equivalent fields in the RIB entry.
+
+The M, L and W fields map to the metric, local-pref and Weight fields of
+the RIB entry respectively.
+
+Finally, the constraints field gives the RPKI constraints that were
+either met or violated for the given RIB entry. It lists a sequence of
+ASN number, Prefix, and the range for each ROA that matches the
+announced prefix in the RIB entry.
+
+
+Devices Report: http:/127.0.0.1:8000/status/devices
+---------------------------------------------------
+
+This page lists the active rpki-router and Trigger devices that are
+configured to be polled for relevant data.
+
+.. image:: /images/EOM-UI-Devices.png
+   :height: 400px
+   :width: 1000px
+
+The Device field lists the Device that is being polled.
+
+The Last Update field specifies the last time that this particular
+device was polled.
+
+The RIB count field specifies the number of entries in the RIB that was
+pulled during the previous poll cycle.
+
+
+The ROA count field specifies the number of prefixes that were
+identified in the last sync with the rpki-rtri server instance.
 

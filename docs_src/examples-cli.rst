@@ -7,21 +7,21 @@ Command Line Usage
 
 A typical execution of EOM would resemble the following:
 
-    $ python eom --sql-database eom_db.sqlite --rtr-rib router1:60:F \
-        --rpki-serv tcp:localhost:8282:0:F
+::
 
-Here:
+    $ python eom --sql-database eom_db.sqlite \
+        --rtr-rib router1:86400:N:local \
+        --rpki-serv tcp:localhost:8282:0:N
 
-* 'router1' refers to the device ID for our router in the Trigger configuration.
 
-* 'localhost' (8282) refers to the host (port) on which we have a running instance of the rpki-rtr manager.
-
-* 'eom_db.sqlite' is the database within which RPKI and RIB information is saved.
-
+See the configuration section for additional details on what these
+options mean.
 
 A configuration file may also be passed to the EOM CLI in lieu of
 passing the three options listed above. An example invocation of eom
 with a configuration file is:
+
+::
 
     $ python eom --config_file eom_config.yml
 
@@ -58,51 +58,4 @@ In this case since the paths are the same it makes no difference.
 However in the case of the /22 route, the route that may be preferred
 may be the one for the /8 aggregate, which originates from a different
 ASN (422). 
-
-EOM GUI Examples
-=================
-
-The following examples assume that the Django app is running on
-127.0.0.1:8000
-
-Status Summary
---------------
-
-This page gives a summary of the error reports availble.
-
-.. image:: /images/EOM-UI-Status.png
-   :height: 500px
-   :width: 1000px
-
-
-The report Id links to the detailed report corresponding to the given
-entry.
-
-The Device name corresponds to the device identifier that was specified
-in the Trigger configuration
-
-The timestamp specifies the time of creation of the report.
-
-The Invalid field specifies that number of routes that were found to be
-invalid in the given report. The actual invalid routes can be viewed by
-looking at the detailed report.
-
-
-Detailed Report
----------------
-
-This page provides details on the routes that were found to be invalid for
-the given device, any covering routes that were found to be valid or
-unspecified, and the constraints that were either violated or satisfied
-for the given prefix and ASN combination. 
-
-.. image:: /images/EOM-UI-Status-Detail.png
-   :height: 500px
-   :width: 1000px
-
-The ROA status can be one of the following:
-
-    ✅  : The ROA constraints matched 
-    ❌  : The ROA constraints did not match
-    ?  : No ROA matching the give prefix was found 
 
