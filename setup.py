@@ -9,7 +9,7 @@ long_description = rh.read()
 rh.close()
 
 setup(name='EOM',
-      version='1.2',
+      version='1.3',
       description='Emulation and Operation Monitoring (EOM) Tool',
       author='Suresh Krishnaswamy',
       author_email='suresh@tislabs.com',
@@ -17,7 +17,7 @@ setup(name='EOM',
       license='See LICENSE',
       long_description=long_description,
       packages=['eom'],
-      scripts=['eom/eom', 'eom/do_poll'],
+      scripts=['eom/eom', 'eom/do_poll.py'],
       platforms='any',
       install_requires=[
 #        'sqlite3',
