@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="eom 1.2 documentation" href="index.html" />
-    <link rel="prev" title="EOM Examples" href="examples.html" />
+    <link rel="prev" title="EOM GUI Examples" href="examples-gui.html" />
    
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
@@ -41,7 +41,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="examples.html" title="EOM Examples"
+          <a href="examples-gui.html" title="EOM GUI Examples"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">eom 1.2 documentation</a> &raquo;</li> 
       </ul>
@@ -64,19 +64,37 @@
 retrieved data into a persistent data store (database).</p>
 <dl class="class">
 <dt id="eom.aggregator.EOMAggregator">
-<em class="property">class </em><code class="descclassname">eom.aggregator.</code><code class="descname">EOMAggregator</code><span class="sig-paren">(</span><em>dbfile='eom_default_db.sqlite'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/aggregator.html#EOMAggregator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.aggregator.EOMAggregator" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">eom.aggregator.</code><code class="descname">EOMAggregator</code><span class="sig-paren">(</span><em>dbfile='eom_default_db.sqlite'</em>, <em>init_db=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/aggregator.html#EOMAggregator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.aggregator.EOMAggregator" title="Permalink to this definition">¶</a></dt>
 <dd><p>A RPKI-Rtr and RIB data aggregator.</p>
 <dl class="method">
 <dt id="eom.aggregator.EOMAggregator.get_covering">
-<code class="descname">get_covering</code><span class="sig-paren">(</span><em>rtr_id</em>, <em>pfxstr_min</em>, <em>pfxstr_max</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/aggregator.html#EOMAggregator.get_covering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.aggregator.EOMAggregator.get_covering" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_covering</code><span class="sig-paren">(</span><em>device</em>, <em>pfxstr_min</em>, <em>pfxstr_max</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/aggregator.html#EOMAggregator.get_covering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.aggregator.EOMAggregator.get_covering" title="Permalink to this definition">¶</a></dt>
 <dd><p>Fetch route entries that cover a given prefix range.</p>
 <p>Select those routes whose advertised address range covers the
 given prefix range.</p>
 <dl class="docutils">
 <dt>Arguments:</dt>
-<dd>rtr_id(string): the router id
+<dd>device(string): the device name
 pfxstr_min(string): the lower value in the prefix range
 pfxstr_max(string): the upper value in the prefix range</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="eom.aggregator.EOMAggregator.get_report_hash">
+<code class="descname">get_report_hash</code><span class="sig-paren">(</span><em>consolidated</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/aggregator.html#EOMAggregator.get_report_hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.aggregator.EOMAggregator.get_report_hash" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a hash value that corresponds to the consolidated routes</p>
+<p>The consolidated routes are structured as a dict. The keys in
+the dict are the index values of the routes. The values against
+each key is a tuple with three values</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd>val1: valid invalid unknown status (&#8216;V&#8217;/&#8217;I&#8217;/&#8217;-&#8216;)
+val2: RIB tuple with the following fields 
+(status, pfx, pfxlen, pfxstr_min, pfxstr_max, nexthop, 
+metric, locpref, weight, pathbutone, orig_asn, route_orig)
+val3: A list of tuples that reflect ROA constraints
+[(asn, prefix, prefixlen, max_prefixlen)...]</dd>
 </dl>
 </dd></dl>
 
@@ -99,6 +117,19 @@ RIB.</p>
 <dt id="eom.aggregator.EOMAggregator.get_sql_connection">
 <code class="descname">get_sql_connection</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/aggregator.html#EOMAggregator.get_sql_connection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.aggregator.EOMAggregator.get_sql_connection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get an instance to the sql connection object.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>None</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="eom.aggregator.EOMAggregator.init_analysis_tables">
+<code class="descname">init_analysis_tables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/aggregator.html#EOMAggregator.init_analysis_tables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.aggregator.EOMAggregator.init_analysis_tables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize RIB database tables.</p>
+<p>Two tables are created. One stores the report ID associated with a
+given run, while the second stores the contents of the report
+indexed by the report id.</p>
 <dl class="docutils">
 <dt>Args:</dt>
 <dd>None</dd>
@@ -157,6 +188,12 @@ for a particular router device.</p>
 </dl>
 </dd></dl>
 
+<dl class="method">
+<dt id="eom.aggregator.EOMAggregator.store_analysis_results">
+<code class="descname">store_analysis_results</code><span class="sig-paren">(</span><em>data</em>, <em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/aggregator.html#EOMAggregator.store_analysis_results"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.aggregator.EOMAggregator.store_analysis_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store the result into the database</p>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -175,7 +212,7 @@ report generation.</p>
 <em class="property">class </em><code class="descclassname">eom.analyzer.</code><code class="descname">EOMAnalyzer</code><span class="sig-paren">(</span><em>aggregator</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/analyzer.html#EOMAnalyzer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.analyzer.EOMAnalyzer" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="eom.analyzer.EOMAnalyzer.analyze">
-<code class="descname">analyze</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/analyzer.html#EOMAnalyzer.analyze"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.analyzer.EOMAnalyzer.analyze" title="Permalink to this definition">¶</a></dt>
+<code class="descname">analyze</code><span class="sig-paren">(</span><em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/analyzer.html#EOMAnalyzer.analyze"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.analyzer.EOMAnalyzer.analyze" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract data from database and analyze.</p>
 <p>Get the list of RIB entries and associated RPKI information to
 be analyzed from the aggregator. Identify valid, invalid and
@@ -254,26 +291,55 @@ routine and repeat the loop.</p>
 
 </dd></dl>
 
-<dl class="function">
-<dt id="eom.analyzer.eom_parse_args">
-<code class="descclassname">eom.analyzer.</code><code class="descname">eom_parse_args</code><span class="sig-paren">(</span><em>desc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/analyzer.html#eom_parse_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.analyzer.eom_parse_args" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="eom.analyzer.rpki_server_spec">
-<code class="descclassname">eom.analyzer.</code><code class="descname">rpki_server_spec</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/analyzer.html#rpki_server_spec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.analyzer.rpki_server_spec" title="Permalink to this definition">¶</a></dt>
-<dd><p>Define the format for the rpki-server spec argument</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="eom.analyzer.rtr_rib_spec">
-<code class="descclassname">eom.analyzer.</code><code class="descname">rtr_rib_spec</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/analyzer.html#rtr_rib_spec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.analyzer.rtr_rib_spec" title="Permalink to this definition">¶</a></dt>
-<dd><p>Define the format for the rtr-rib spec argument</p>
-</dd></dl>
-
 </div>
-<div class="section" id="eom-do-poll-module">
-<h2>eom.do_poll module<a class="headerlink" href="#eom-do-poll-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-eom.do_poll">
+<span id="eom-do-poll-module"></span><h2>eom.do_poll module<a class="headerlink" href="#module-eom.do_poll" title="Permalink to this headline">¶</a></h2>
+<p>Fetch RIB information from routers.</p>
+<p>This scripts queries the given device for its RIB information using the
+&#8216;sh ip bgp&#8217; command. The script assumes that one of either Trigger or
+RANCID has been configured in order to enable the router to authenticate
+the issuance of such commands from the querying machine.</p>
+<p>NOTE: That RANCID support appears to be not fully supported in Trigger,
+so this does not seem to work properly at the moment.</p>
+<p>The output is returned as a JSON representation of a dict structure,
+indexed on the device name and the command run.</p>
+<dl class="class">
+<dt id="eom.do_poll.CommandWrapper">
+<em class="property">class </em><code class="descclassname">eom.do_poll.</code><code class="descname">CommandWrapper</code><span class="sig-paren">(</span><em>devicenames</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/do_poll.html#CommandWrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.do_poll.CommandWrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generic Command Wrapper Class.</p>
+<p>Allows us to poll the attached net devices for BGP information. 
+Note that this class must not be instantiated directly.</p>
+<dl class="method">
+<dt id="eom.do_poll.CommandWrapper.poll">
+<code class="descname">poll</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/do_poll.html#CommandWrapper.poll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.do_poll.CommandWrapper.poll" title="Permalink to this definition">¶</a></dt>
+<dd><p>Poll device list for BGP RIB information.</p>
+<p>Poll all the NetDevices that are associated with this object and
+query them for BGP RIB information using &#8216;sh ip bgp&#8217;. The
+results are returned as a JSON string.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>None.</dd>
+<dt>Returns:</dt>
+<dd>str: A JSON string representation of the results</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="eom.do_poll.RancidCommandWrapper">
+<em class="property">class </em><code class="descclassname">eom.do_poll.</code><code class="descname">RancidCommandWrapper</code><span class="sig-paren">(</span><em>devicenames</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/do_poll.html#RancidCommandWrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.do_poll.RancidCommandWrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#eom.do_poll.CommandWrapper" title="eom.do_poll.CommandWrapper"><code class="xref py py-class docutils literal"><span class="pre">eom.do_poll.CommandWrapper</span></code></a></p>
+<p>Subclass for issuing router commands using RANCID</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="eom.do_poll.TriggerCommandWrapper">
+<em class="property">class </em><code class="descclassname">eom.do_poll.</code><code class="descname">TriggerCommandWrapper</code><span class="sig-paren">(</span><em>devicenames</em>, <em>realm</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/do_poll.html#TriggerCommandWrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.do_poll.TriggerCommandWrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#eom.do_poll.CommandWrapper" title="eom.do_poll.CommandWrapper"><code class="xref py py-class docutils literal"><span class="pre">eom.do_poll.CommandWrapper</span></code></a></p>
+<p>Subclass for issuing router commands using Trigger</p>
+</dd></dl>
+
 </div>
 <div class="section" id="module-eom.generic_poller">
 <span id="eom-generic-poller-module"></span><h2>eom.generic_poller module<a class="headerlink" href="#module-eom.generic_poller" title="Permalink to this headline">¶</a></h2>
@@ -342,7 +408,7 @@ the User Interface (currently stdout).</p>
 
 <dl class="method">
 <dt id="eom.reporter.EOMReporter.show">
-<code class="descname">show</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/reporter.html#EOMReporter.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.reporter.EOMReporter.show" title="Permalink to this definition">¶</a></dt>
+<code class="descname">show</code><span class="sig-paren">(</span><em>data</em>, <em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/reporter.html#EOMReporter.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.reporter.EOMReporter.show" title="Permalink to this definition">¶</a></dt>
 <dd><p>Display data onto the User Interface</p>
 <dl class="docutils">
 <dt>Args:</dt>
@@ -482,14 +548,15 @@ to use the Python twisted framework.</p>
 
 <dl class="method">
 <dt id="eom.rtr_poller.RtrRIBState.store_in_db">
-<code class="descname">store_in_db</code><span class="sig-paren">(</span><em>rib</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/rtr_poller.html#RtrRIBState.store_in_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.rtr_poller.RtrRIBState.store_in_db" title="Permalink to this definition">¶</a></dt>
+<code class="descname">store_in_db</code><span class="sig-paren">(</span><em>rib</em>, <em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/rtr_poller.html#RtrRIBState.store_in_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.rtr_poller.RtrRIBState.store_in_db" title="Permalink to this definition">¶</a></dt>
 <dd><p>Store the given RIB data into the database.</p>
 <p>Updating the database involves two steps. First is to make sure
 that old entries are deleted and then to add each RIB entry into
 its own row indexed by the router id.</p>
 <dl class="docutils">
 <dt>Args:</dt>
-<dd>rib: A dict containing parsed RIB information</dd>
+<dd>rib: A dict containing parsed RIB information
+ts: Timestamp associated with the polled data</dd>
 <dt>Returns:</dt>
 <dd>None</dd>
 </dl>
@@ -497,11 +564,12 @@ its own row indexed by the router id.</p>
 
 <dl class="method">
 <dt id="eom.rtr_poller.RtrRIBState.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>output</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/rtr_poller.html#RtrRIBState.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.rtr_poller.RtrRIBState.update" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update</code><span class="sig-paren">(</span><em>output</em>, <em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eom/rtr_poller.html#RtrRIBState.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#eom.rtr_poller.RtrRIBState.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse output and store results to database.</p>
 <dl class="docutils">
 <dt>Args:</dt>
-<dd>output: The output generated by do_poll.py</dd>
+<dd>output: The output generated by do_poll.py
+ts: Timestamp associated with the poll operation</dd>
 <dt>Returns:</dt>
 <dd>A dict containing parsed RIB entries</dd>
 </dl>
@@ -539,7 +607,7 @@ TriggerCommandWrapper: Subclass for issuing router commands using Trigger</p>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-eom.aggregator">eom.aggregator module</a></li>
 <li><a class="reference internal" href="#module-eom.analyzer">eom.analyzer module</a></li>
-<li><a class="reference internal" href="#eom-do-poll-module">eom.do_poll module</a></li>
+<li><a class="reference internal" href="#module-eom.do_poll">eom.do_poll module</a></li>
 <li><a class="reference internal" href="#module-eom.generic_poller">eom.generic_poller module</a></li>
 <li><a class="reference internal" href="#module-eom.reporter">eom.reporter module</a></li>
 <li><a class="reference internal" href="#module-eom.rpki_rtr_cli">eom.rpki_rtr_cli module</a></li>
@@ -550,8 +618,8 @@ TriggerCommandWrapper: Subclass for issuing router commands using Trigger</p>
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="examples.html"
-                        title="previous chapter">EOM Examples</a></p>
+  <p class="topless"><a href="examples-gui.html"
+                        title="previous chapter">EOM GUI Examples</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">

@@ -61,11 +61,13 @@
 <p>The purpose of this tool is to provide an emulation environment in which
 an ISP (or other BGP AS) can analyze the impact of planned deployment of
 RPKI validation in local conditions, without impacting their routing
-operations. The EOM Tool is expected to assist the operator in scenarios
-such as the following (note that not all of these features are
+operations.</p>
+<p>In the current version the tool simply enables the operator to assess if
+best route selection changes when validation is enabled.
+In the future the EOM Tool could assist the operator in
+scenarios such as the following (note that these features are
 implemented yet).</p>
 <ul class="simple">
-<li>Assessing if the best route selection changes when validation is enabled.</li>
 <li>Assessing the manner in which the best path changes when different localpref/weight settings are used.</li>
 <li>Combining data from multiple routers in different ASNs to check for any routing-level inconsistencies.</li>
 <li>Assessing potential problems associated with validating prefixes in a multihoming environment.</li>
@@ -79,7 +81,7 @@ the EOM tool. At a high level the EOM tool fetches RPKI information
 from one or more RPKI caches, polls RIB related information from routers,
 analyzes the different pieces of data retrived from these data
 sources against various parameters, and display its results through some
-front-end (note that not all components are implemented yet).</p>
+front-end.</p>
 <a class="reference internal image-reference" href="_images/EOM-Block-Diag.png"><img alt="_images/EOM-Block-Diag.png" src="_images/EOM-Block-Diag.png" style="width: 1000px; height: 500px;" /></a>
 <p>The following sub-sections describe the functionality associated with
 each EOM tool sub-component.</p>
@@ -89,7 +91,7 @@ each EOM tool sub-component.</p>
 protocol.  It builds upon the existing rpki-rtr
 implementation from rpki.net but instead of communicating with a router
 this module interfaces with an aggregator module that maintains a
-local data store of validated RPKI information.</p>
+local store of validated RPKI information.</p>
 <p>The rpki-rtr-cli module can communicate with multiple rpki-rtr manager
 instances in order to be able to mimic cases where an ISP relies on
 multiple rpki-rtr manager instances for serving validated RPKI
@@ -99,16 +101,12 @@ information to its various ASBR routers.</p>
 <h3>rtr-status-fetcher<a class="headerlink" href="#rtr-status-fetcher" title="Permalink to this headline">¶</a></h3>
 <p>This module is responsible for fetching various pieces of status
 information from a router, including its routing table and next hop
-neighbors.</p>
-<p>In order to fetch router RIB information, we experimented with two
-different pieces of software. We used RANCID initially, but  later
-switched to the Trigger module in order to fetch the output from the &#8216;sh
-ip bgp&#8217; command run on specific routers. The Trigger module provides a
-cleaner python-based interface to the RIB extraction function, but it
-has an event loop structure that is currently incompatible with the
-rpki-rtr module. This issue will be revisited in later releases of the
-EOM software in order to make the data fetch operations from the two
-modules more compatible.</p>
+neighbors. The data is fetched using the Trigger module which queries
+each configured router for its &#8216;sh ip bgp&#8217; output.</p>
+<p>Note that the event loop structure in Trigger is  incompatible with the
+rpki-rtr module. This issue may have to be revisited in later releases
+of the EOM software in order to make the data fetch operations from the
+two modules more compatible.</p>
 <p>The rtr-status-fetcher module saves all fetched data into a local store
 through the aggregator module.</p>
 </div>
@@ -120,10 +118,10 @@ and router status information for the different routers queried.</p>
 </div>
 <div class="section" id="eom-engine">
 <h3>EOM-engine<a class="headerlink" href="#eom-engine" title="Permalink to this headline">¶</a></h3>
-<p>The EOM-Engine module is responsible for providing the
-central functionality for enabling a network operator to configure
-and develop various types of operational scenarios and router policies
-to study the impact of RPKI validation on their network operations.</p>
+<p>The EOM-Engine module provides the central functionality for enabling a
+network operator to configure and develop various types of operational
+scenarios and router policies to study the impact of RPKI validation on
+their network operations.</p>
 <p>This module is still under development, but is expected to interface
 with the UI module to gather user input on the types of analyses that
 are to be performed. It will access previously saved router and RPKI
@@ -136,40 +134,27 @@ fly to simulate various prefix assignment and certification conditions.</p>
 </div>
 <div class="section" id="analyzer">
 <h3>analyzer<a class="headerlink" href="#analyzer" title="Permalink to this headline">¶</a></h3>
-<p>This module provides the first level of analysis over the
-different streams of data that are made available to it.  The primary
-function of this module is to detect and flag differences in the routing
-state.</p>
+<p>This module performs the analysis over the different streams of data
+that are made available to it.  The primary function of this module is
+to detect and flag differences in the routing state. It stores the
+results of its processing in persistent storage through the aggregator
+module.</p>
 </div>
 <div class="section" id="reporter">
 <h3>reporter<a class="headerlink" href="#reporter" title="Permalink to this headline">¶</a></h3>
 <p>The reporter takes the raw results generated by the
 analyzer module and transforms that data to a form that is useful for
-user consumption. Differences are currently represented as simple text
-but will later be color coded and marked up to clearly highlight any
-differences.</p>
-</div>
-<div class="section" id="notifier">
-<h3>notifier<a class="headerlink" href="#notifier" title="Permalink to this headline">¶</a></h3>
-<p>This module is still to be developed.</p>
-<p>The notifier module will be responsible for processing the results from
-the analyzer module in order to present those results to the user in an
-intuitive manner in order to help them develop additional test scenarios
-in an iterative manner. In the future, when the EOM tool is used as a
-monitoring tool, this module will also provide user notification
-capabilities to warn and alert the user of existing and impending
-problems.</p>
+user consumption. The output format is currently simple text, but it
+could be changed to other more useful formats as needed.</p>
 </div>
 <div class="section" id="ui">
 <h3>UI<a class="headerlink" href="#ui" title="Permalink to this headline">¶</a></h3>
-<p>This module is still to be developed.</p>
-<p>The User Interface module will provide the engine for displaying the
-various pieces of data generated by the data-reporter and notifier
-modules. This module will also provide the configuration interface for
-the users, to enable them to specify the location and parameters
-associated with the different routers and RPKI stores, and to enable
-them to define the parameters associated with their different scenarios
-of interest.</p>
+<p>The User Interface module provides the engine for displaying the
+various pieces of EOM data. In the future, this module will also provide
+the configuration interface for the users, to enable them to specify the
+location and parameters associated with the different routers and RPKI
+stores, and to enable them to define the parameters associated with
+their different scenarios of interest.</p>
 </div>
 </div>
 </div>
@@ -190,7 +175,6 @@ of interest.</p>
 <li><a class="reference internal" href="#eom-engine">EOM-engine</a></li>
 <li><a class="reference internal" href="#analyzer">analyzer</a></li>
 <li><a class="reference internal" href="#reporter">reporter</a></li>
-<li><a class="reference internal" href="#notifier">notifier</a></li>
 <li><a class="reference internal" href="#ui">UI</a></li>
 </ul>
 </li>

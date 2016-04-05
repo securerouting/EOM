@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="eom 1.2 documentation" href="index.html" />
-    <link rel="next" title="EOM Examples" href="examples.html" />
+    <link rel="next" title="EOM Configuration" href="configuration.html" />
     <link rel="prev" title="EOM - An Emulation and Operations Monitoring Tool" href="introduction.html" />
    
   
@@ -42,7 +42,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="examples.html" title="EOM Examples"
+          <a href="configuration.html" title="EOM Configuration"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="introduction.html" title="EOM - An Emulation and Operations Monitoring Tool"
@@ -94,6 +94,35 @@ the patch in the patches directory need to be applied by hand.</p>
 for router management. Information on configuring Trigger can be found
 on <a class="reference external" href="https://trigger.readthedocs.org/en/latest">https://trigger.readthedocs.org/en/latest</a></p>
 </div>
+<div class="section" id="installation-of-the-eom-package-with-cli-tools">
+<h2>Installation of the EOM package (with CLI tools)<a class="headerlink" href="#installation-of-the-eom-package-with-cli-tools" title="Permalink to this headline">¶</a></h2>
+<p>The package can be installed by running the setup.py script as follows</p>
+<div class="highlight-python"><div class="highlight"><pre>$ python setup.py install
+</pre></div>
+</div>
+</div>
+<div class="section" id="installation-of-eom-ui">
+<h2>Installation of EOM UI<a class="headerlink" href="#installation-of-eom-ui" title="Permalink to this headline">¶</a></h2>
+<p>The EOM tool comes with a Django-based GUI. Currently this interface is
+mainly for viewing EOM results and cannot be used to configure the EOM
+tool.</p>
+<p>In order to run the Django app in production it must be installed in
+conjunction with an existing webserver instantiation. The specific
+instructions for setting this up is out of scope for this document, but
+may be found online. For example, see
+<a class="reference external" href="https://docs.djangoproject.com/en/1.9/howto/deployment/wsgi/modwsgi/">https://docs.djangoproject.com/en/1.9/howto/deployment/wsgi/modwsgi/</a></p>
+<p>In order to run the Django app in test mode the following command may be
+used:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ cd EOM-dist/eom_ui
+$ python manage.py runserver
+...
+Starting development server at http://127.0.0.1:8000/
+Quit the server with CONTROL-C.
+</pre></div>
+</div>
+<p>Note that the eom module needs to be configured first. See the
+configuration section for instructions on configuring the EOM tool.</p>
+</div>
 <div class="section" id="license">
 <h2>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
@@ -101,13 +130,6 @@ on <a class="reference external" href="https://trigger.readthedocs.org/en/latest
 <li>The license information for the Trigger module is at <a class="reference external" href="https://trigger.readthedocs.org/en/latest/license.html">https://trigger.readthedocs.org/en/latest/license.html</a></li>
 <li>The pyparsing module is distributed with a MIT license. See <a class="reference external" href="http://pyparsing.wikispaces.com/share/view/5698048">http://pyparsing.wikispaces.com/share/view/5698048</a></li>
 </ul>
-</div>
-<div class="section" id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<p>The package can be installed by running the setup.py script as follows:</p>
-<div class="highlight-python"><div class="highlight"><pre>$ python setup.py install
-</pre></div>
-</div>
 </div>
 </div>
 
@@ -123,8 +145,9 @@ on <a class="reference external" href="https://trigger.readthedocs.org/en/latest
 <li><a class="reference internal" href="#dependencies">Dependencies</a></li>
 <li><a class="reference internal" href="#installing-a-patched-version-of-rpki-rtr">Installing a patched version of rpki-rtr</a></li>
 <li><a class="reference internal" href="#trigger-setup">Trigger setup</a></li>
+<li><a class="reference internal" href="#installation-of-the-eom-package-with-cli-tools">Installation of the EOM package (with CLI tools)</a></li>
+<li><a class="reference internal" href="#installation-of-eom-ui">Installation of EOM UI</a></li>
 <li><a class="reference internal" href="#license">License</a></li>
-<li><a class="reference internal" href="#installation">Installation</a></li>
 </ul>
 </li>
 </ul>
@@ -133,8 +156,8 @@ on <a class="reference external" href="https://trigger.readthedocs.org/en/latest
   <p class="topless"><a href="introduction.html"
                         title="previous chapter">EOM  - An Emulation and Operations Monitoring Tool</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="examples.html"
-                        title="next chapter">EOM Examples</a></p>
+  <p class="topless"><a href="configuration.html"
+                        title="next chapter">EOM Configuration</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">

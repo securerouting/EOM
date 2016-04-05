@@ -170,7 +170,7 @@
                     <span class="k">pass</span>
         <span class="k">return</span> <span class="n">results</span>
 </div>
-<div class="viewcode-block" id="RtrRIBState.store_in_db"><a class="viewcode-back" href="../../eom.html#eom.rtr_poller.RtrRIBState.store_in_db">[docs]</a>    <span class="k">def</span> <span class="nf">store_in_db</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rib</span><span class="p">):</span>
+<div class="viewcode-block" id="RtrRIBState.store_in_db"><a class="viewcode-back" href="../../eom.html#eom.rtr_poller.RtrRIBState.store_in_db">[docs]</a>    <span class="k">def</span> <span class="nf">store_in_db</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rib</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Store the given RIB data into the database.</span>
 
 <span class="sd">        Updating the database involves two steps. First is to make sure</span>
@@ -179,21 +179,25 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            rib: A dict containing parsed RIB information</span>
+<span class="sd">            ts: Timestamp associated with the polled data</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">rib</span><span class="p">:</span>
-            <span class="k">print</span> <span class="s">&quot;Updating Database with new data.&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">rib</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;Could not refresh database with new data for </span><span class="si">%s</span><span class="s">.&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;Updating Database with new data for </span><span class="si">%s</span><span class="s">.&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span>
             <span class="c">#pprint(rib)</span>
             <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
             <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;SELECT rtr_id, device FROM rtr_cache WHERE device = ?&quot;</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="p">))</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">rtr_id</span><span class="p">,</span> <span class="n">device</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+                <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;PRAGMA foreign_keys = on&quot;</span><span class="p">)</span>
                 <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;DELETE FROM rtr_cache WHERE device = ?&quot;</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="p">))</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span> <span class="c"># Simulate lookup failure case</span>
             <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
-                <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;INSERT INTO rtr_cache (device) VALUES (?)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,))</span>
+                <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;INSERT INTO rtr_cache (device, rtrupdt) VALUES (?, ?)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">ts</span><span class="p">))</span>
                 <span class="n">rtr_id</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">lastrowid</span>
             <span class="c"># Update RIB info</span>
             <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
@@ -227,18 +231,18 @@
                 <span class="n">idx</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
 </div>
-<div class="viewcode-block" id="RtrRIBState.update"><a class="viewcode-back" href="../../eom.html#eom.rtr_poller.RtrRIBState.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">):</span>
+<div class="viewcode-block" id="RtrRIBState.update"><a class="viewcode-back" href="../../eom.html#eom.rtr_poller.RtrRIBState.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Parse output and store results to database.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            output: The output generated by do_poll.py</span>
+<span class="sd">            ts: Timestamp associated with the poll operation</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            A dict containing parsed RIB entries</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">ribinfo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">ribinfo</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">store_in_db</span><span class="p">(</span><span class="n">ribinfo</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">store_in_db</span><span class="p">(</span><span class="n">ribinfo</span><span class="p">,</span> <span class="n">ts</span><span class="p">)</span>
 
 </div></div>
 <div class="viewcode-block" id="EOMRtrRIBFetcher"><a class="viewcode-back" href="../../eom.html#eom.rtr_poller.EOMRtrRIBFetcher">[docs]</a><span class="k">class</span> <span class="nc">EOMRtrRIBFetcher</span><span class="p">(</span><span class="n">EOMGenericPoller</span><span class="p">):</span>
@@ -289,14 +293,14 @@
         <span class="k">if</span> <span class="n">now</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_update</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">poll_interval</span><span class="p">:</span>
             <span class="c"># Start a fresh lookup</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">realm</span><span class="p">:</span>
-                <span class="n">output</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="s">&quot;do_poll&quot;</span><span class="p">,</span> <span class="s">&quot;--device&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="s">&quot;--realm&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">realm</span><span class="p">])</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="s">&quot;do_poll.py&quot;</span><span class="p">,</span> <span class="s">&quot;--device&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="s">&quot;--realm&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">realm</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">output</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="s">&quot;do_poll&quot;</span><span class="p">,</span> <span class="s">&quot;--device&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">])</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="s">&quot;do_poll.py&quot;</span><span class="p">,</span> <span class="s">&quot;--device&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">])</span>
             <span class="c">#output = subprocess.check_output([&quot;python&quot;, &quot;-W ignore&quot;, &quot;do_poll.py&quot;, &quot;--device&quot;, self.device])</span>
             <span class="c">#output = subprocess.check_output([&quot;clogin&quot;, &quot;-c &#39;show ip bgp&#39;&quot;, self.device])</span>
             <span class="c">#output = str(&#39;{&quot;quagga.vm&quot;: {&quot;show ip bgp&quot;: &quot;BGP table version is 0, local router ID is 192.168.56.101\\r\\nStatus codes: s suppressed, d damped, h history, * valid, &gt; best, i - internal,\\r\\n              r RIB-failure, S Stale, R Removed\\r\\nOrigin codes: i - IGP, e - EGP, ? - incomplete\\r\\n\\r\\n   Network          Next Hop            Metric LocPrf Weight Path\\r\\n*&gt;i1.9.0.0/16       192.168.56.1            10      0      0 3257 4788 i\\r\\n*&gt;i1.9.21.0/24      192.168.56.1                    0      0 7018 6453 4788 4788 i\\r\\n\\r\\nTotal number of prefixes 2\\r\\n&quot;}}&#39;)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">ribstate</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">last_update</span> <span class="o">=</span> <span class="n">Timestamp</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ribstate</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">now</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">last_update</span> <span class="o">=</span> <span class="n">now</span>
 
         <span class="c"># Since we&#39;re doing the lookup as a sub-process we&#39;re never</span>
         <span class="c"># waiting for data. So the pending status is always false.</span>
