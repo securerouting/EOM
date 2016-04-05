@@ -228,14 +228,14 @@ class EOMAggregator:
                     "   INNER JOIN rtr_cache ON rtr_cache.rtr_id = rtr_rib.rtr_id", ())
         return cur.fetchall()
 
-    def get_covering(self, rtr_id, pfxstr_min, pfxstr_max):
+    def get_covering(self, device, pfxstr_min, pfxstr_max):
         """Fetch route entries that cover a given prefix range.
 
         Select those routes whose advertised address range covers the
         given prefix range.
 
         Arguments:
-            rtr_id(string): the router id
+            device(string): the device name
             pfxstr_min(string): the lower value in the prefix range
             pfxstr_max(string): the upper value in the prefix range
         """
@@ -243,8 +243,9 @@ class EOMAggregator:
         cur.execute("SELECT idx, status, pfx, pfxlen, pfxstr_min, pfxstr_max, nexthop, metric, "
                     "   locpref, weight, pathbutone, orig_asn, route_orig "
                     "FROM rtr_rib "
-                    "WHERE rtr_id = ? AND pfxstr_min <= ? AND pfxstr_max >= ?",
-                    (rtr_id, pfxstr_min, pfxstr_max))
+                    "INNER JOIN rtr_cache ON rtr_cache.rtr_id = rtr_rib.rtr_id "
+                    "WHERE device = ? AND pfxstr_min <= ? AND pfxstr_max >= ?",
+                    (device, pfxstr_min, pfxstr_max))
         return cur.fetchall()
 
 
