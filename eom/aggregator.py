@@ -256,12 +256,13 @@ class EOMAggregator:
         the dict are the index values of the routes. The values against
         each key is a tuple with three values
 
-        val1: valid invalid unknown status ('V'/'I'/'-')
-        val2: RIB tuple with the following fields 
-                (status, pfx, pfxlen, pfxstr_min, pfxstr_max, nexthop, 
-                 metric, locpref, weight, pathbutone, orig_asn, route_orig)
-        val3: A list of tuples that reflect ROA constraints
-                [(asn, prefix, prefixlen, max_prefixlen)...]
+        Arguments:
+            val1: valid invalid unknown status ('V'/'I'/'-')
+            val2: RIB tuple with the following fields 
+            (status, pfx, pfxlen, pfxstr_min, pfxstr_max, nexthop, 
+            metric, locpref, weight, pathbutone, orig_asn, route_orig)
+            val3: A list of tuples that reflect ROA constraints
+            [(asn, prefix, prefixlen, max_prefixlen)...]
         """
         jsonstr = json.dumps(consolidated, sort_keys=True)
         hashobj = hashlib.sha1(jsonstr)
