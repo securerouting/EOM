@@ -47,7 +47,7 @@ class LatestEntriesFeed(Feed):
         return ReportIndex.objects.order_by('-report_id')[:5]
 
     def item_title(self, item):
-        return "TS:%s" % item.timestamp
+        return "TS:%s" % item.timestamp_str
 
     def item_description(self, item):
         return "Device:%s Invalid:%i"  % (item.device, item.invalid)
