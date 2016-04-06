@@ -96,5 +96,5 @@ EOM monitor.
 The summary information for the feed contains the time stamp associated
 with the report generation, the device name and the number of invalid
 entries detected. Clicking on the RSS entry leads the user to the detail
-report page associated with that particualar report as shown in the
+report page associated with that particular report as shown in the
 figure.
