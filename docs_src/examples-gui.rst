@@ -42,11 +42,15 @@ for the given prefix and ASN combination.
 
 The ROA status can be one of the following:
 
-    ✅  : The ROA constraints matched 
+.. |valid| unicode:: U+2705
+.. |invalid| unicode:: U+274C
+.. |unknown| unicode:: U+003f
 
-    ❌  : The ROA constraints did not match
+|valid| : The ROA constraints matched 
 
-     ? : No ROA matching the give prefix was found 
+|invalid| : The ROA constraints did not match
+
+|unknown| : No ROA matching the give prefix was found 
 
 The Network, NextHop, Origin, and Path fields correspond to the
 equivalent fields in the RIB entry.
