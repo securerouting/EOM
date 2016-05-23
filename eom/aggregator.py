@@ -146,13 +146,11 @@ class EOMAggregator:
                     report_id       INTEGER PRIMARY KEY AUTOINCREMENT,
                     report_hash     TEXT NOT NULL,
                     device          TEXT NOT NULL,
-                    timestamp       INTEGER NOT NULL,
-                    UNIQUE          (report_hash))''')
+                    timestamp       INTEGER NOT NULL)''')
         cur.execute('''
                 CREATE TABLE report_detail (
                     route_id        INTEGER PRIMARY KEY AUTOINCREMENT,
-                    report_hash     TEXT NOT NULL
-                                    REFERENCES report_index(report_hash),
+                    report_hash     TEXT NOT NULL,
                     invalid         TEXT NOT NULL,
                     status          TEXT NOT NULL,
                     pfx             TEXT NOT NULL,
