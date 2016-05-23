@@ -9,14 +9,14 @@ long_description = rh.read()
 rh.close()
 
 setup(name='EOM',
-      version='1.3',
+      version='1.4',
       description='Emulation and Operation Monitoring (EOM) Tool',
       author='Suresh Krishnaswamy',
       author_email='suresh@tislabs.com',
       url='https://securerouting.net',
       license='See LICENSE',
       long_description=long_description,
-      packages=['eom'],
+      packages=['eom', 'eom_ui'],
       scripts=['eom/eom', 'eom/do_poll.py'],
       platforms='any',
       install_requires=[

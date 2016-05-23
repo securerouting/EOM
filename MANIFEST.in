@@ -1,5 +1,6 @@
 include LICENSE README 
 recursive-include eom *.py eom do_poll.py
+recursive-include eom_ui *
 recursive-include docs *
 recursive-include tests *
 recursive-include patches *
