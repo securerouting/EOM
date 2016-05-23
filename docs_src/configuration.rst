@@ -87,6 +87,8 @@ polled for RPKI information.
   instance.
 * the host/port fields sepcify the location of the running rpki-rtr
   server instance.
+* force specifies the version to use. Set this value to -1 if no
+  particular version is to be forced.
 * reset specifies whether the rtr_cache table is to be flushed prior to
   the initial poll operation.
 
