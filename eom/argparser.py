@@ -29,7 +29,7 @@ class rpki_server_spec:
             # There is no database per channel, but we need to define the
             # parameter in the namespace
             n.sql_database = None
-            if d['force'] == '-1':
+            if str(d['force']) == "-1":
                 n.force_version = None 
             else:
                 n.force_version = int(d['force']) 
