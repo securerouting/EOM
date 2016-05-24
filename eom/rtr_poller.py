@@ -60,6 +60,7 @@ class RtrRIBState:
         ip6Field = Or([hexint, Literal(":")])
         ip6Addr = Combine(OneOrMore(ip6Field))
         ipAddr = Or([ip4Addr, ip6Addr])
+        ipNet = Optional(Combine(ipAddr("pfx") + Literal("/") + Word(nums,max=2)("pfxlen")))
         status_code = Combine(Optional(oneOf("s d h * r")) + Optional(Literal(">")) + Optional(Literal("i")))
         next_hop = ipAddr
         integer = Word(nums).setParseAction(lambda t: int(t[0])).setName("integer")
@@ -69,8 +70,7 @@ class RtrRIBState:
         path = Group(OneOrMore(Word(nums)))
         origin = oneOf("i e ?")
 
-        return status_code("status") + ipAddr("pfx") + Literal("/") + \
-            Word(nums,max=2)("pfxlen") + ipAddr("nexthop") + \
+        return status_code("status") + ipNet + ipAddr("nexthop") + \
             metric("metric") + locpref("locpref") + weight("weight") + \
             path("path") + origin("route_orig")
 
@@ -148,11 +148,24 @@ class RtrRIBState:
                 rtr_id = cur.lastrowid
             # Update RIB info
             idx = 0
+            saved_pfx = None
+            saved_pfxlen = None
             for r in rib:
                 # Split path into pathbutone and orig_asn
                 pathbutone = r.path
                 orig_asn = pathbutone.pop()
                 pathbutonestr = ' '.join(pathbutone)
+                # The IP address may be omitted when they are identical
+                # in two consecutive lines. So save the current one for
+                # next use
+                if r.pfx and r.pfxlen:
+                    saved_pfx = r.pfx
+                    saved_pfxlen = r.pfxlen
+                elif saved_pfx:
+                    r.pfx = saved_pfx
+                    r.pfxlen = saved_pfxlen
+                else:
+                    continue
                 ipstr = unicode(str(r.pfx) + "/" + str(r.pfxlen), "utf-8")
                 prefixint_min = netaddr.IPNetwork(ipstr).first
                 prefixint_max = netaddr.IPNetwork(ipstr).last
