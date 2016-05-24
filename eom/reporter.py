@@ -24,10 +24,14 @@ class EOMReporter:
         """
         (status, pfx, pfxlen, pfxstr_min, pfxstr_max, nexthop, metric,
          locpref, weight, pathbutone, orig_asn, route_orig) = rib_tup
+        if pathbutone == "":
+            pathstr = str(orig_asn)
+        else:
+            pathstr = pathbutone + " " + str(orig_asn)
         return status + "\t" + pfx + "/" + str(pfxlen) + "\t" + \
                nexthop + "\t" + str(metric) + "\t" + \
                str(locpref) + "\t" + str(weight) + "\t" + \
-               pathbutone + " " + str(orig_asn) + "\t" + route_orig
+               pathstr + "\t" + route_orig
 
     def show(self, data, ts):
         """Display data onto the User Interface
