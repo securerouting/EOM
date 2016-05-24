@@ -13,7 +13,6 @@ def index(request):
     return render(request, 'status/index.html', context)
 
 def detail(request, rep_id):
-#    routes = ReportDetail.objects.all()
     routes = []
     if ReportIndex.objects.all():
         ri = ReportIndex.objects.get(report_id=rep_id)
