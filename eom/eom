@@ -55,7 +55,10 @@ def main():
     args = eom_parse_args(__doc__)
 #    setup_logging(args)
     analyzer = EOMEngine(args)
-    analyzer.run() 
+    try:
+        analyzer.run() 
+    except Exception as e:
+        print "EOM Analysis Failure: " + str(e)
 
 
 if __name__ == "__main__":
