@@ -177,9 +177,9 @@ class RtrRIBState:
                           EOMGenericPoller.get_ip_str(prefixint_min),
                           EOMGenericPoller.get_ip_str(prefixint_max),
                           r.nexthop, 
-                          int(r.metric) if r.metric else 0, 
-                          int(r.locpref) if r.locpref else 0, 
-                          int(r.weight) if r.weight else 0, 
+                          int(r.metric) if r.metric else -1, 
+                          int(r.locpref) if r.locpref else -1, 
+                          int(r.weight) if r.weight else -1, 
                           pathbutonestr, 
                           int(orig_asn), 
                           r.route_orig)

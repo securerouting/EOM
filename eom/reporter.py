@@ -28,9 +28,12 @@ class EOMReporter:
             pathstr = str(orig_asn)
         else:
             pathstr = pathbutone + " " + str(orig_asn)
+        metstr = str(metric) if metric >= 0 else ""
+        lpstr = str(locpref) if locpref >= 0 else ""
+        wtstr = str(weight) if weight >= 0 else ""
         return status + "\t" + pfx + "/" + str(pfxlen) + "\t" + \
-               nexthop + "\t" + str(metric) + "\t" + \
-               str(locpref) + "\t" + str(weight) + "\t" + \
+               nexthop + "\t" + metstr + "\t" + \
+               lpstr + "\t" + wtstr + "\t" + \
                pathstr + "\t" + route_orig
 
     def show(self, data, ts):
