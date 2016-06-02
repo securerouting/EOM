@@ -47,7 +47,7 @@ class EOMAnalyzer:
         matched = defaultdict(dict)
 
         toprocess = self.aggregator.get_rpki_rib()
-        for (device, index, asn, prefix, prefixlen, max_prefixlen, 
+        for (host, port, device, index, asn, prefix, prefixlen, max_prefixlen, 
                 status, pfx, pfxlen, pfxstr_min, pfxstr_max, nexthop,
                 metric, locpref, weight, pathbutone, orig_asn,
                 route_orig) in toprocess:
@@ -59,7 +59,7 @@ class EOMAnalyzer:
             # Create a RIB entry tuple
             rib_tup = (status, pfx, pfxlen, pfxstr_min, pfxstr_max, nexthop,
                        metric, locpref, weight, pathbutone, orig_asn, route_orig)
-            rpki_info = (asn, prefix, prefixlen, max_prefixlen)
+            rpki_info = (host, port, asn, prefix, prefixlen, max_prefixlen)
             if asn == orig_asn and pfxlen <= max_prefixlen:
                 # If we find a good match, remove the entry from our
                 # bad-info state
