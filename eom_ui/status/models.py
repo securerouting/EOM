@@ -160,6 +160,8 @@ class ReportDetail(models.Model):
 class Fconstraints(models.Model):
     fcons_id = models.AutoField(primary_key=True)
     route_id = models.TextField()
+    host = models.TextField()
+    port = models.TextField()
     asn = models.TextField()
     prefix = models.TextField()
     prefixlen = models.IntegerField()
