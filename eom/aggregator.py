@@ -169,6 +169,8 @@ class EOMAggregator:
                     fcons_id        INTEGER PRIMARY KEY AUTOINCREMENT,
                     route_id        TEXT NOT NULL
                                     REFERENCES report_detail(route_id),
+                    host            TEXT NOT NULL,
+                    port            TEXT NOT NULL,
                     asn             TEXT NOT NULL,
                     prefix          TEXT NOT NULL,
                     prefixlen       INTEGER NOT NULL,
@@ -218,12 +220,13 @@ class EOMAggregator:
             None
         """
         cur = self.sql.cursor()
-        cur.execute("SELECT DISTINCT device, idx, asn, prefix, prefixlen, "
+        cur.execute("SELECT DISTINCT host, port, device, idx, asn, prefix, prefixlen, "
                     "   max_prefixlen, status, pfx, pfxlen, pfxstr_min, pfxstr_max, "
                     "   nexthop, metric, locpref, weight, pathbutone, orig_asn, route_orig "
-                    "FROM prefix INNER JOIN rtr_rib ON "
-                    "   prefix_min <= pfxstr_min AND pfxstr_max <= prefix_max"
-                    "   INNER JOIN rtr_cache ON rtr_cache.rtr_id = rtr_rib.rtr_id", ())
+                    "FROM prefix "
+                    "   INNER JOIN rtr_rib ON prefix_min <= pfxstr_min AND pfxstr_max <= prefix_max"
+                    "   INNER JOIN rtr_cache ON rtr_cache.rtr_id = rtr_rib.rtr_id"
+                    "   INNER JOIN cache ON cache.cache_id = prefix.cache_id", ())
         return cur.fetchall()
 
     def get_covering(self, device, pfxstr_min, pfxstr_max):
@@ -291,8 +294,8 @@ class EOMAggregator:
                     route_id = cur.lastrowid
                     if v[2]:
                         # should be a list of tuples of constraints that failed
-                        for (asn, prefix, prefixlen, max_prefixlen) in v[2]:
-                            cur.execute("INSERT INTO fconstraints (route_id, asn, prefix, prefixlen, max_prefixlen) "
-                                        "VALUES (?, ?, ?, ?, ?)", 
-                                        (route_id, asn, prefix, prefixlen, max_prefixlen))
+                        for (host, port, asn, prefix, prefixlen, max_prefixlen) in v[2]:
+                            cur.execute("INSERT INTO fconstraints (route_id, host, port, asn, prefix, prefixlen, max_prefixlen) "
+                                        "VALUES (?, ?, ?, ?, ?, ?, ?)", 
+                                        (route_id, host, port, asn, prefix, prefixlen, max_prefixlen))
         self.sql.commit()
