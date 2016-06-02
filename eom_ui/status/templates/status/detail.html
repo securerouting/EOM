@@ -53,13 +53,11 @@
             <td>
                 <table class='table'>
                 {% for c in r.constraints %}
-                <!--
-                    <tr> <td> AS:{{ c.0 }} Prefix:{{ c.1 }} Range:[{{ c.2 }}-{{ c.3 }}] </td> </tr>
-                -->
                 <div id="cblock">
-                    <div>AS:{{ c.0 }}</div>
-                    <div>Prefix:{{ c.1 }}</div>
-                    <div>Range:[{{ c.2 }}-{{ c.3 }}]</div>
+                    <div>Server:{{ c.0 }}:{{ c.1 }}</div>
+                    <div>AS:{{ c.2 }}</div>
+                    <div>Prefix:{{ c.3 }}</div>
+                    <div>Range:[{{ c.4 }}-{{ c.5 }}]</div>
                 </div>
                 {% endfor %}
                 </table>

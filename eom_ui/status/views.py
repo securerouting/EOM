@@ -29,7 +29,7 @@ def detail(request, rep_id):
         r.constraints = []
         constraints = Fconstraints.objects.filter(route_id=r.route_id)
         for c in constraints:
-            r.constraints.append((c.asn, c.prefix, c.prefixlen, c.max_prefixlen))
+            r.constraints.append((c.host, c.port, c.asn, c.prefix, c.prefixlen, c.max_prefixlen))
     context = { 'routes': routes }
     return render(request, 'status/detail.html', context)
 
