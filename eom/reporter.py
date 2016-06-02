@@ -56,6 +56,6 @@ class EOMReporter:
             for (i, v) in sorted(data[rtr].items(), key=lambda x:int(x[0])):
                 print v[0] + " : " + self.get_rib_display_str(v[1])
                 if v[2]:
-                    for (asn, prefix, prefixlen, max_prefixlen) in v[2]:
+                    for (host, port, asn, prefix, prefixlen, max_prefixlen) in v[2]:
                         rpkirtrpfxstr = str(asn) + ":" + prefix + "/" + "[" + str(prefixlen) + '-' + str(max_prefixlen) + "]"
-                        print "\t" + rpkirtrpfxstr
+                        print "\t" + host + ":" + port + ": " + rpkirtrpfxstr
