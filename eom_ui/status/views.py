@@ -22,6 +22,7 @@ def detail(request, rep_id):
     for r in routes:
         # Split the path into its constituent ASNs
         r.pathlist = r.pathbutone.split(' ')
+        r.best = ">" if '>' in r.status else ""
         r.metstr = str(r.metric) if int(r.metric) >= 0 else ""
         r.lpstr = str(r.locpref) if int(r.locpref) >= 0 else ""
         r.wtstr = str(r.weight) if int(r.weight) >= 0 else ""

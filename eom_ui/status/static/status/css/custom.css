@@ -9,7 +9,7 @@ h2 {
 }
 
 .eomtable {
-    table-layout: fixed;
+    /*table-layout: fixed;*/
     width: 100%;
     border-collapse: collapse;
     border-spacing: 0;
@@ -49,6 +49,9 @@ h2 {
 .row-status {
       width: 4%;
 }
+.row-best {
+      width: 4%;
+}
 .row-network {
       width: 12%;
 }
@@ -68,10 +71,10 @@ h2 {
       width: 10%;
 }
 .row-path {
-      width: 25%;
+      width: 23%;
 }
 .row-constraints {
-      width: 25%;
+      width: 23%;
 }
 
 

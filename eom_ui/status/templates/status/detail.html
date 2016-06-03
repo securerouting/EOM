@@ -9,6 +9,7 @@
         <thead>
             <tr>
             <th class="row-status row-header">ROA</th>
+            <th class="row-best row-header">B</th>
             <th class="row-network row-header">Network</th>
             <th class="row-nexthop row-header">NextHop</th>
             <th class="row-metric row-header">M</th>
@@ -34,6 +35,7 @@
                     &#x003f;
                 {% endif %}
             </td>
+            <td> {{ r.best }} </td>
             <td> {{ r.pfx }}/{{ r.pfxlen }} </td>
             <td> {{ r.nexthop }} </td>
             <td> {{ r.metstr }} </td>
