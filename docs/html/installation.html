@@ -66,17 +66,26 @@ eom package.</p>
 <li>logging</li>
 </ul>
 </div>
-<div class="section" id="installing-a-patched-version-of-rpki-rtr">
-<h2>Installing a patched version of rpki-rtr<a class="headerlink" href="#installing-a-patched-version-of-rpki-rtr" title="Permalink to this headline">¶</a></h2>
-<p>EOM also needs a couple of changes to be made to the rpki.rtr code. Util
-these changes are merged into the main rpki.net software distribution,
-the patch in the patches directory need to be applied by hand.</p>
-</div>
 <div class="section" id="trigger-setup">
 <h2>Trigger setup<a class="headerlink" href="#trigger-setup" title="Permalink to this headline">¶</a></h2>
 <p>EOM assumes that the operator already has a pre-configured Trigger setup
 for router management. Information on configuring Trigger can be found
 on <a class="reference external" href="https://trigger.readthedocs.org/en/latest">https://trigger.readthedocs.org/en/latest</a></p>
+</div>
+<div class="section" id="building-rpki-rtr">
+<h2>Building rpki-rtr<a class="headerlink" href="#building-rpki-rtr" title="Permalink to this headline">¶</a></h2>
+<p>The EOM tool relies on a (modified) rpki-rtr module in order to pull
+data from a rpki-rtr server. The code that provides this functionality
+must be built separately. In order to do so, use the following sequence
+of steps:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ autoconf
+$ ./configure
+$ make
+</pre></div>
+</div>
+<p>The specific changes made to the stock rpki-rtr distribution from the
+RPKI.net software can be viewed in the patch file stored in the
+&#8216;patches&#8217; directory.</p>
 </div>
 <div class="section" id="installation-of-the-eom-package-with-cli-tools">
 <h2>Installation of the EOM package (with CLI tools)<a class="headerlink" href="#installation-of-the-eom-package-with-cli-tools" title="Permalink to this headline">¶</a></h2>
@@ -127,8 +136,8 @@ configuration section for instructions on configuring the EOM tool.</p>
   <ul>
 <li><a class="reference internal" href="#">EOM Installation</a><ul>
 <li><a class="reference internal" href="#dependencies">Dependencies</a></li>
-<li><a class="reference internal" href="#installing-a-patched-version-of-rpki-rtr">Installing a patched version of rpki-rtr</a></li>
 <li><a class="reference internal" href="#trigger-setup">Trigger setup</a></li>
+<li><a class="reference internal" href="#building-rpki-rtr">Building rpki-rtr</a></li>
 <li><a class="reference internal" href="#installation-of-the-eom-package-with-cli-tools">Installation of the EOM package (with CLI tools)</a></li>
 <li><a class="reference internal" href="#installation-of-eom-ui">Installation of EOM UI</a></li>
 <li><a class="reference internal" href="#license">License</a></li>
