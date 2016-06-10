@@ -2,7 +2,7 @@ SUBDIRS=ext
 OPENSSL_VERSION=1.0.2h
 EXTRA_TARGETS=@EXTRA_TARGETS@
 CLEANFILES=*/*.pyc */*/*.pyc rpki/POW/_POW.so openssl openssl-$(OPENSSL_VERSION)
-DISTCLEANFILES=$(CLEANFILES) Makefile config.status config.log autom4te.cache
+DISTCLEANFILES=$(CLEANFILES) configure Makefile config.status config.log autom4te.cache
 
 all: $(EXTRA_TARGETS)
 	for d in $(SUBDIRS); do make -C $$d $@; done
@@ -14,6 +14,7 @@ openssl/libcrypto.a:
 	tar -xf openssl-$(OPENSSL_VERSION).tar.gz
 	ln -s openssl-$(OPENSSL_VERSION) openssl
 	cd openssl && ./config shared no-dso enable-rfc3779
+	#cd openssl && ./Configure darwin64-x86_64-cc enable-rfc3779
 	make -C openssl depend
 	make -C openssl build_libcrypto
 
