@@ -58,10 +58,13 @@ class CommandWrapper():
             # Or just explicitly fetch them without trying to populate them:
             # tcrc = tacacsrc.Tacacsrc()
             # creds = tcrc.creds[realm]
-            c = cmds.Commando(devices=self.devicelist, commands=[self.command], verbose=False, creds=credobj)
+            c = cmds.Commando(devices=self.devicelist,
+                    commands=[self.command], verbose=False,
+                    creds=credobj, timeout=300)
             #c = cmds.Commando(devices=self.devicelist, timeout=None, commands=[self.command], verbose=False, creds=credobj)
         else:
-            c = cmds.Commando(devices=self.devicelist, commands=[self.command], verbose=False)
+            c = cmds.Commando(devices=self.devicelist,
+                    commands=[self.command], verbose=False, timeout=300)
             #c = cmds.Commando(devices=self.devicelist, timeout=None, commands=[self.command], verbose=False)
         c.run()
         return (json.dumps(c.results))
