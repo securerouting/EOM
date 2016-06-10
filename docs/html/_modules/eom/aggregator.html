@@ -2,11 +2,11 @@
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>eom.aggregator &mdash; eom 1.2 documentation</title>
+    <title>eom.aggregator &mdash; eom 1.5 documentation</title>
     
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '1.2',
+        VERSION:     '1.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -23,27 +23,16 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="eom 1.2 documentation" href="../../index.html" />
+    <link rel="top" title="eom 1.5 documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" />
    
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
   </head>
   <body role="document">
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">eom 1.2 documentation</a> &raquo;</li>
-          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
-      </ul>
-    </div>  
+  
 
     <div class="document">
       <div class="documentwrapper">
@@ -51,7 +40,7 @@
           <div class="body" role="main">
             
   <h1>Source code for eom.aggregator</h1><div class="highlight"><pre>
-<span class="sd">&quot;&quot;&quot;Implementation of the data aggregation module for EOM.</span>
+<span></span><span class="sd">&quot;&quot;&quot;Implementation of the data aggregation module for EOM.</span>
 
 <span class="sd">This module interfaces with various fetcher modules and stores the</span>
 <span class="sd">retrieved data into a persistent data store (database).</span>
@@ -65,7 +54,7 @@
 <div class="viewcode-block" id="EOMAggregator"><a class="viewcode-back" href="../../eom.html#eom.aggregator.EOMAggregator">[docs]</a><span class="k">class</span> <span class="nc">EOMAggregator</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;A RPKI-Rtr and RIB data aggregator.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dbfile</span><span class="o">=</span><span class="s">&quot;eom_default_db.sqlite&quot;</span><span class="p">,</span> <span class="n">init_db</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dbfile</span><span class="o">=</span><span class="s2">&quot;eom_default_db.sqlite&quot;</span><span class="p">,</span> <span class="n">init_db</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Instantiate the data aggregator object.</span>
 
 <span class="sd">        Args:</span>
@@ -88,8 +77,8 @@
 <span class="sd">        Args:</span>
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span>
-</div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span></div>
+
 <div class="viewcode-block" id="EOMAggregator.init_rpki_rtr_tables"><a class="viewcode-back" href="../../eom.html#eom.aggregator.EOMAggregator.init_rpki_rtr_tables">[docs]</a>    <span class="k">def</span> <span class="nf">init_rpki_rtr_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initialize rpki-rtr database tables.</span>
 <span class="sd">       </span>
@@ -102,47 +91,47 @@
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;PRAGMA foreign_keys = on&quot;</span><span class="p">)</span>
-        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&#39;&#39;&#39;</span>
-<span class="s">                CREATE TABLE cache (</span>
-<span class="s">                    cache_id        INTEGER PRIMARY KEY NOT NULL,</span>
-<span class="s">                    host            TEXT NOT NULL,</span>
-<span class="s">                    port            TEXT NOT NULL,</span>
-<span class="s">                    version         INTEGER,</span>
-<span class="s">                    nonce           INTEGER,</span>
-<span class="s">                    serial          INTEGER,</span>
-<span class="s">                    updated         INTEGER,</span>
-<span class="s">                    refresh         INTEGER,</span>
-<span class="s">                    retry           INTEGER,</span>
-<span class="s">                    expire          INTEGER,</span>
-<span class="s">                    UNIQUE          (host, port))&#39;&#39;&#39;</span><span class="p">)</span>
-        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&#39;&#39;&#39;</span>
-<span class="s">                CREATE TABLE prefix (</span>
-<span class="s">                    prefix_id       INTEGER PRIMARY KEY AUTOINCREMENT,</span>
-<span class="s">                    cache_id        INTEGER NOT NULL</span>
-<span class="s">                                    REFERENCES cache(cache_id)</span>
-<span class="s">                                    ON DELETE CASCADE</span>
-<span class="s">                                    ON UPDATE CASCADE,</span>
-<span class="s">                    asn             INTEGER NOT NULL,</span>
-<span class="s">                    prefix          TEXT NOT NULL,</span>
-<span class="s">                    prefixlen       INTEGER NOT NULL,</span>
-<span class="s">                    max_prefixlen   INTEGER NOT NULL,</span>
-<span class="s">                    prefix_min      TEXT,</span>
-<span class="s">                    prefix_max      TEXT,</span>
-<span class="s">                    UNIQUE          (cache_id, asn, prefix, prefixlen, max_prefixlen))&#39;&#39;&#39;</span><span class="p">)</span>
-        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&#39;&#39;&#39;</span>
-<span class="s">                CREATE TABLE routerkey (</span>
-<span class="s">                    cache_id        INTEGER NOT NULL</span>
-<span class="s">                                    REFERENCES cache(cache_id)</span>
-<span class="s">                                    ON DELETE CASCADE</span>
-<span class="s">                                    ON UPDATE CASCADE,</span>
-<span class="s">                    asn             INTEGER NOT NULL,</span>
-<span class="s">                    ski             TEXT NOT NULL,</span>
-<span class="s">                    key             TEXT NOT NULL,</span>
-<span class="s">                    UNIQUE          (cache_id, asn, ski),</span>
-<span class="s">                    UNIQUE          (cache_id, asn, key))&#39;&#39;&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
-</div>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;PRAGMA foreign_keys = on&quot;</span><span class="p">)</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">                CREATE TABLE cache (</span>
+<span class="s1">                    cache_id        INTEGER PRIMARY KEY NOT NULL,</span>
+<span class="s1">                    host            TEXT NOT NULL,</span>
+<span class="s1">                    port            TEXT NOT NULL,</span>
+<span class="s1">                    version         INTEGER,</span>
+<span class="s1">                    nonce           INTEGER,</span>
+<span class="s1">                    serial          INTEGER,</span>
+<span class="s1">                    updated         INTEGER,</span>
+<span class="s1">                    refresh         INTEGER,</span>
+<span class="s1">                    retry           INTEGER,</span>
+<span class="s1">                    expire          INTEGER,</span>
+<span class="s1">                    UNIQUE          (host, port))&#39;&#39;&#39;</span><span class="p">)</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">                CREATE TABLE prefix (</span>
+<span class="s1">                    prefix_id       INTEGER PRIMARY KEY AUTOINCREMENT,</span>
+<span class="s1">                    cache_id        INTEGER NOT NULL</span>
+<span class="s1">                                    REFERENCES cache(cache_id)</span>
+<span class="s1">                                    ON DELETE CASCADE</span>
+<span class="s1">                                    ON UPDATE CASCADE,</span>
+<span class="s1">                    asn             INTEGER NOT NULL,</span>
+<span class="s1">                    prefix          TEXT NOT NULL,</span>
+<span class="s1">                    prefixlen       INTEGER NOT NULL,</span>
+<span class="s1">                    max_prefixlen   INTEGER NOT NULL,</span>
+<span class="s1">                    prefix_min      TEXT,</span>
+<span class="s1">                    prefix_max      TEXT,</span>
+<span class="s1">                    UNIQUE          (cache_id, asn, prefix, prefixlen, max_prefixlen))&#39;&#39;&#39;</span><span class="p">)</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">                CREATE TABLE routerkey (</span>
+<span class="s1">                    cache_id        INTEGER NOT NULL</span>
+<span class="s1">                                    REFERENCES cache(cache_id)</span>
+<span class="s1">                                    ON DELETE CASCADE</span>
+<span class="s1">                                    ON UPDATE CASCADE,</span>
+<span class="s1">                    asn             INTEGER NOT NULL,</span>
+<span class="s1">                    ski             TEXT NOT NULL,</span>
+<span class="s1">                    key             TEXT NOT NULL,</span>
+<span class="s1">                    UNIQUE          (cache_id, asn, ski),</span>
+<span class="s1">                    UNIQUE          (cache_id, asn, key))&#39;&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span></div>
+
 <div class="viewcode-block" id="EOMAggregator.init_rib_tables"><a class="viewcode-back" href="../../eom.html#eom.aggregator.EOMAggregator.init_rib_tables">[docs]</a>    <span class="k">def</span> <span class="nf">init_rib_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initialize RIB database tables.</span>
 <span class="sd">       </span>
@@ -154,34 +143,34 @@
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;PRAGMA foreign_keys = on&quot;</span><span class="p">)</span>
-        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&#39;&#39;&#39;</span>
-<span class="s">                CREATE TABLE rtr_cache (</span>
-<span class="s">                    rtr_id          INTEGER PRIMARY KEY NOT NULL,</span>
-<span class="s">                    device          TEXT NOT NULL,</span>
-<span class="s">                    rtrupdt         INTEGER,</span>
-<span class="s">                    UNIQUE          (device))&#39;&#39;&#39;</span><span class="p">)</span>
-        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&#39;&#39;&#39;</span>
-<span class="s">                CREATE TABLE rtr_rib (</span>
-<span class="s">                    rtr_id          INTEGER NOT NULL</span>
-<span class="s">                                    REFERENCES rtr_cache(rtr_id)</span>
-<span class="s">                                    ON DELETE CASCADE</span>
-<span class="s">                                    ON UPDATE CASCADE,</span>
-<span class="s">                    idx             INTEGER NOT NULL,</span>
-<span class="s">                    status          TEXT,</span>
-<span class="s">                    pfx             TEXT NOT NULL,</span>
-<span class="s">                    pfxlen          INTEGER NOT NULL,</span>
-<span class="s">                    pfxstr_min      TEXT NOT NULL,</span>
-<span class="s">                    pfxstr_max      TEXT NOT NULL,</span>
-<span class="s">                    nexthop         TEXT NOT NULL,</span>
-<span class="s">                    metric          INTEGER,</span>
-<span class="s">                    locpref         INTEGER,</span>
-<span class="s">                    weight          INTEGER,</span>
-<span class="s">                    pathbutone      TEXT,</span>
-<span class="s">                    orig_asn        INTEGER NOT NULL,</span>
-<span class="s">                    route_orig      TEXT)&#39;&#39;&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
-</div>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;PRAGMA foreign_keys = on&quot;</span><span class="p">)</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">                CREATE TABLE rtr_cache (</span>
+<span class="s1">                    rtr_id          INTEGER PRIMARY KEY NOT NULL,</span>
+<span class="s1">                    device          TEXT NOT NULL,</span>
+<span class="s1">                    rtrupdt         INTEGER,</span>
+<span class="s1">                    UNIQUE          (device))&#39;&#39;&#39;</span><span class="p">)</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">                CREATE TABLE rtr_rib (</span>
+<span class="s1">                    rtr_id          INTEGER NOT NULL</span>
+<span class="s1">                                    REFERENCES rtr_cache(rtr_id)</span>
+<span class="s1">                                    ON DELETE CASCADE</span>
+<span class="s1">                                    ON UPDATE CASCADE,</span>
+<span class="s1">                    idx             INTEGER NOT NULL,</span>
+<span class="s1">                    status          TEXT,</span>
+<span class="s1">                    pfx             TEXT NOT NULL,</span>
+<span class="s1">                    pfxlen          INTEGER NOT NULL,</span>
+<span class="s1">                    pfxstr_min      TEXT NOT NULL,</span>
+<span class="s1">                    pfxstr_max      TEXT NOT NULL,</span>
+<span class="s1">                    nexthop         TEXT NOT NULL,</span>
+<span class="s1">                    metric          INTEGER,</span>
+<span class="s1">                    locpref         INTEGER,</span>
+<span class="s1">                    weight          INTEGER,</span>
+<span class="s1">                    pathbutone      TEXT,</span>
+<span class="s1">                    orig_asn        INTEGER NOT NULL,</span>
+<span class="s1">                    route_orig      TEXT)&#39;&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span></div>
+
 <div class="viewcode-block" id="EOMAggregator.init_analysis_tables"><a class="viewcode-back" href="../../eom.html#eom.aggregator.EOMAggregator.init_analysis_tables">[docs]</a>    <span class="k">def</span> <span class="nf">init_analysis_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Initialize RIB database tables.</span>
 <span class="sd">       </span>
@@ -193,43 +182,43 @@
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;PRAGMA foreign_keys = on&quot;</span><span class="p">)</span>
-        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&#39;&#39;&#39;</span>
-<span class="s">                CREATE TABLE report_index (</span>
-<span class="s">                    report_id       INTEGER PRIMARY KEY AUTOINCREMENT,</span>
-<span class="s">                    report_hash     TEXT NOT NULL,</span>
-<span class="s">                    device          TEXT NOT NULL,</span>
-<span class="s">                    timestamp       INTEGER NOT NULL,</span>
-<span class="s">                    UNIQUE          (report_hash))&#39;&#39;&#39;</span><span class="p">)</span>
-        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&#39;&#39;&#39;</span>
-<span class="s">                CREATE TABLE report_detail (</span>
-<span class="s">                    route_id        INTEGER PRIMARY KEY AUTOINCREMENT,</span>
-<span class="s">                    report_hash     TEXT NOT NULL</span>
-<span class="s">                                    REFERENCES report_index(report_hash),</span>
-<span class="s">                    invalid         TEXT NOT NULL,</span>
-<span class="s">                    status          TEXT NOT NULL,</span>
-<span class="s">                    pfx             TEXT NOT NULL,</span>
-<span class="s">                    pfxlen          TEXT NOT NULL,</span>
-<span class="s">                    pfxstr_min      TEXT NOT NULL,</span>
-<span class="s">                    pfxstr_max      TEXT NOT NULL,</span>
-<span class="s">                    nexthop         TEXT NOT NULL,</span>
-<span class="s">                    metric          TEXT NOT NULL,</span>
-<span class="s">                    locpref         TEXT NOT NULL,</span>
-<span class="s">                    weight          TEXT NOT NULL,</span>
-<span class="s">                    pathbutone      TEXT NOT NULL,</span>
-<span class="s">                    orig_asn        TEXT NOT NULL,</span>
-<span class="s">                    route_orig      TEXT NOT NULL)&#39;&#39;&#39;</span><span class="p">)</span>
-        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&#39;&#39;&#39;</span>
-<span class="s">                CREATE TABLE fconstraints (</span>
-<span class="s">                    fcons_id        INTEGER PRIMARY KEY AUTOINCREMENT,</span>
-<span class="s">                    route_id        TEXT NOT NULL</span>
-<span class="s">                                    REFERENCES report_detail(route_id),</span>
-<span class="s">                    asn             TEXT NOT NULL,</span>
-<span class="s">                    prefix          TEXT NOT NULL,</span>
-<span class="s">                    prefixlen       INTEGER NOT NULL,</span>
-<span class="s">                    max_prefixlen   INTEGER NOT NULL)&#39;&#39;&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
-</div>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;PRAGMA foreign_keys = on&quot;</span><span class="p">)</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">                CREATE TABLE report_index (</span>
+<span class="s1">                    report_id       INTEGER PRIMARY KEY AUTOINCREMENT,</span>
+<span class="s1">                    report_hash     TEXT NOT NULL,</span>
+<span class="s1">                    device          TEXT NOT NULL,</span>
+<span class="s1">                    timestamp       INTEGER NOT NULL)&#39;&#39;&#39;</span><span class="p">)</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">                CREATE TABLE report_detail (</span>
+<span class="s1">                    route_id        INTEGER PRIMARY KEY AUTOINCREMENT,</span>
+<span class="s1">                    report_hash     TEXT NOT NULL,</span>
+<span class="s1">                    invalid         TEXT NOT NULL,</span>
+<span class="s1">                    status          TEXT NOT NULL,</span>
+<span class="s1">                    pfx             TEXT NOT NULL,</span>
+<span class="s1">                    pfxlen          TEXT NOT NULL,</span>
+<span class="s1">                    pfxstr_min      TEXT NOT NULL,</span>
+<span class="s1">                    pfxstr_max      TEXT NOT NULL,</span>
+<span class="s1">                    nexthop         TEXT NOT NULL,</span>
+<span class="s1">                    metric          TEXT NOT NULL,</span>
+<span class="s1">                    locpref         TEXT NOT NULL,</span>
+<span class="s1">                    weight          TEXT NOT NULL,</span>
+<span class="s1">                    pathbutone      TEXT NOT NULL,</span>
+<span class="s1">                    orig_asn        TEXT NOT NULL,</span>
+<span class="s1">                    route_orig      TEXT NOT NULL)&#39;&#39;&#39;</span><span class="p">)</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">                CREATE TABLE fconstraints (</span>
+<span class="s1">                    fcons_id        INTEGER PRIMARY KEY AUTOINCREMENT,</span>
+<span class="s1">                    route_id        TEXT NOT NULL</span>
+<span class="s1">                                    REFERENCES report_detail(route_id),</span>
+<span class="s1">                    host            TEXT NOT NULL,</span>
+<span class="s1">                    port            TEXT NOT NULL,</span>
+<span class="s1">                    asn             TEXT NOT NULL,</span>
+<span class="s1">                    prefix          TEXT NOT NULL,</span>
+<span class="s1">                    prefixlen       INTEGER NOT NULL,</span>
+<span class="s1">                    max_prefixlen   INTEGER NOT NULL)&#39;&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span></div>
+
 <div class="viewcode-block" id="EOMAggregator.reset_rpki_rtr_session"><a class="viewcode-back" href="../../eom.html#eom.aggregator.EOMAggregator.reset_rpki_rtr_session">[docs]</a>    <span class="k">def</span> <span class="nf">reset_rpki_rtr_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Reset an existing rpki-rtr session.</span>
 
@@ -241,10 +230,10 @@
 <span class="sd">            port (string): the rpki-rtr server port </span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;PRAGMA foreign_keys = on&quot;</span><span class="p">)</span>
-        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;DELETE FROM cache WHERE host = ? and port = ?&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
-</div>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;PRAGMA foreign_keys = on&quot;</span><span class="p">)</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;DELETE FROM cache WHERE host = ? and port = ?&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span></div>
+
 <div class="viewcode-block" id="EOMAggregator.reset_rtr_rib_session"><a class="viewcode-back" href="../../eom.html#eom.aggregator.EOMAggregator.reset_rtr_rib_session">[docs]</a>    <span class="k">def</span> <span class="nf">reset_rtr_rib_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Reset a RIB query session.</span>
 
@@ -256,10 +245,10 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;PRAGMA foreign_keys = on&quot;</span><span class="p">)</span>
-        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;DELETE FROM rtr_cache WHERE device = ?&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
-</div>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;PRAGMA foreign_keys = on&quot;</span><span class="p">)</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;DELETE FROM rtr_cache WHERE device = ?&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span></div>
+
 <div class="viewcode-block" id="EOMAggregator.get_rpki_rib"><a class="viewcode-back" href="../../eom.html#eom.aggregator.EOMAggregator.get_rpki_rib">[docs]</a>    <span class="k">def</span> <span class="nf">get_rpki_rib</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Fetch rib information in conjunction with rpki information.</span>
 
@@ -273,14 +262,15 @@
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;SELECT DISTINCT device, idx, asn, prefix, prefixlen, &quot;</span>
-                    <span class="s">&quot;   max_prefixlen, status, pfx, pfxlen, pfxstr_min, pfxstr_max, &quot;</span>
-                    <span class="s">&quot;   nexthop, metric, locpref, weight, pathbutone, orig_asn, route_orig &quot;</span>
-                    <span class="s">&quot;FROM prefix INNER JOIN rtr_rib ON &quot;</span>
-                    <span class="s">&quot;   prefix_min &lt;= pfxstr_min AND pfxstr_max &lt;= prefix_max&quot;</span>
-                    <span class="s">&quot;   INNER JOIN rtr_cache ON rtr_cache.rtr_id = rtr_rib.rtr_id&quot;</span><span class="p">,</span> <span class="p">())</span>
-        <span class="k">return</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
-</div>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT DISTINCT host, port, device, idx, asn, prefix, prefixlen, &quot;</span>
+                    <span class="s2">&quot;   max_prefixlen, status, pfx, pfxlen, pfxstr_min, pfxstr_max, &quot;</span>
+                    <span class="s2">&quot;   nexthop, metric, locpref, weight, pathbutone, orig_asn, route_orig &quot;</span>
+                    <span class="s2">&quot;FROM prefix &quot;</span>
+                    <span class="s2">&quot;   INNER JOIN rtr_rib ON prefix_min &lt;= pfxstr_min AND pfxstr_max &lt;= prefix_max&quot;</span>
+                    <span class="s2">&quot;   INNER JOIN rtr_cache ON rtr_cache.rtr_id = rtr_rib.rtr_id&quot;</span>
+                    <span class="s2">&quot;   INNER JOIN cache ON cache.cache_id = prefix.cache_id&quot;</span><span class="p">,</span> <span class="p">())</span>
+        <span class="k">return</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span></div>
+
 <div class="viewcode-block" id="EOMAggregator.get_covering"><a class="viewcode-back" href="../../eom.html#eom.aggregator.EOMAggregator.get_covering">[docs]</a>    <span class="k">def</span> <span class="nf">get_covering</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device</span><span class="p">,</span> <span class="n">pfxstr_min</span><span class="p">,</span> <span class="n">pfxstr_max</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Fetch route entries that cover a given prefix range.</span>
 
@@ -293,15 +283,15 @@
 <span class="sd">            pfxstr_max(string): the upper value in the prefix range</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;SELECT idx, status, pfx, pfxlen, pfxstr_min, pfxstr_max, nexthop, metric, &quot;</span>
-                    <span class="s">&quot;   locpref, weight, pathbutone, orig_asn, route_orig &quot;</span>
-                    <span class="s">&quot;FROM rtr_rib &quot;</span>
-                    <span class="s">&quot;INNER JOIN rtr_cache ON rtr_cache.rtr_id = rtr_rib.rtr_id &quot;</span>
-                    <span class="s">&quot;WHERE device = ? AND pfxstr_min &lt;= ? AND pfxstr_max &gt;= ?&quot;</span><span class="p">,</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT idx, status, pfx, pfxlen, pfxstr_min, pfxstr_max, nexthop, metric, &quot;</span>
+                    <span class="s2">&quot;   locpref, weight, pathbutone, orig_asn, route_orig &quot;</span>
+                    <span class="s2">&quot;FROM rtr_rib &quot;</span>
+                    <span class="s2">&quot;INNER JOIN rtr_cache ON rtr_cache.rtr_id = rtr_rib.rtr_id &quot;</span>
+                    <span class="s2">&quot;WHERE device = ? AND pfxstr_min &lt;= ? AND pfxstr_max &gt;= ?&quot;</span><span class="p">,</span>
                     <span class="p">(</span><span class="n">device</span><span class="p">,</span> <span class="n">pfxstr_min</span><span class="p">,</span> <span class="n">pfxstr_max</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span></div>
 
-</div>
+
 <div class="viewcode-block" id="EOMAggregator.get_report_hash"><a class="viewcode-back" href="../../eom.html#eom.aggregator.EOMAggregator.get_report_hash">[docs]</a>    <span class="k">def</span> <span class="nf">get_report_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">consolidated</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get a hash value that corresponds to the consolidated routes</span>
 <span class="sd">           </span>
@@ -320,36 +310,36 @@
         <span class="n">jsonstr</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">consolidated</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
         <span class="n">hashobj</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span><span class="n">jsonstr</span><span class="p">)</span>
         <span class="n">hexval</span> <span class="o">=</span> <span class="n">hashobj</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">hexval</span> 
-</div>
+        <span class="k">return</span> <span class="n">hexval</span> </div>
+
 <div class="viewcode-block" id="EOMAggregator.store_analysis_results"><a class="viewcode-back" href="../../eom.html#eom.aggregator.EOMAggregator.store_analysis_results">[docs]</a>    <span class="k">def</span> <span class="nf">store_analysis_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Store the result into the database&quot;&quot;&quot;</span>
         <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">rtr</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
             <span class="n">report_hash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_report_hash</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">rtr</span><span class="p">])</span>
-            <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;INSERT INTO report_index (report_hash, device, timestamp) VALUES (?, ?, ?)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">report_hash</span><span class="p">,</span> <span class="n">rtr</span><span class="p">,</span> <span class="n">ts</span><span class="p">))</span>
+            <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO report_index (report_hash, device, timestamp) VALUES (?, ?, ?)&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">report_hash</span><span class="p">,</span> <span class="n">rtr</span><span class="p">,</span> <span class="n">ts</span><span class="p">))</span>
             <span class="n">report_id</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">lastrowid</span>
-            <span class="c"># Check if the report_hash already exists </span>
-            <span class="c"># if not, then add the route entries</span>
-            <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;SELECT route_id FROM report_detail WHERE report_hash = ?&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">report_hash</span><span class="p">,))</span>
+            <span class="c1"># Check if the report_hash already exists </span>
+            <span class="c1"># if not, then add the route entries</span>
+            <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT route_id FROM report_detail WHERE report_hash = ?&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">report_hash</span><span class="p">,))</span>
             <span class="n">rdata</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">rdata</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">rtr</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
                     <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">report_hash</span><span class="p">]</span>
                     <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                     <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-                    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;INSERT INTO report_detail (report_hash, invalid, status, pfx, pfxlen, &quot;</span>
-                                <span class="s">&quot;pfxstr_min, pfxstr_max, nexthop, metric, locpref, weight, &quot;</span>
-                                <span class="s">&quot;pathbutone, orig_asn, route_orig) &quot;</span>
-                                <span class="s">&quot;VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)&quot;</span><span class="p">,</span> 
+                    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO report_detail (report_hash, invalid, status, pfx, pfxlen, &quot;</span>
+                                <span class="s2">&quot;pfxstr_min, pfxstr_max, nexthop, metric, locpref, weight, &quot;</span>
+                                <span class="s2">&quot;pathbutone, orig_asn, route_orig) &quot;</span>
+                                <span class="s2">&quot;VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)&quot;</span><span class="p">,</span> 
                                 <span class="p">(</span><span class="n">args</span><span class="p">))</span>
                     <span class="n">route_id</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">lastrowid</span>
                     <span class="k">if</span> <span class="n">v</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
-                        <span class="c"># should be a list of tuples of constraints that failed</span>
-                        <span class="k">for</span> <span class="p">(</span><span class="n">asn</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">prefixlen</span><span class="p">,</span> <span class="n">max_prefixlen</span><span class="p">)</span> <span class="ow">in</span> <span class="n">v</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
-                            <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">&quot;INSERT INTO fconstraints (route_id, asn, prefix, prefixlen, max_prefixlen) &quot;</span>
-                                        <span class="s">&quot;VALUES (?, ?, ?, ?, ?)&quot;</span><span class="p">,</span> 
-                                        <span class="p">(</span><span class="n">route_id</span><span class="p">,</span> <span class="n">asn</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">prefixlen</span><span class="p">,</span> <span class="n">max_prefixlen</span><span class="p">))</span>
+                        <span class="c1"># should be a list of tuples of constraints that failed</span>
+                        <span class="k">for</span> <span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">asn</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">prefixlen</span><span class="p">,</span> <span class="n">max_prefixlen</span><span class="p">)</span> <span class="ow">in</span> <span class="n">v</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
+                            <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;INSERT INTO fconstraints (route_id, host, port, asn, prefix, prefixlen, max_prefixlen) &quot;</span>
+                                        <span class="s2">&quot;VALUES (?, ?, ?, ?, ?, ?, ?)&quot;</span><span class="p">,</span> 
+                                        <span class="p">(</span><span class="n">route_id</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">asn</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">prefixlen</span><span class="p">,</span> <span class="n">max_prefixlen</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sql</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span></div></div>
 </pre></div>
 
@@ -357,18 +347,23 @@
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -379,8 +374,8 @@
       &copy;2015, Parsons Corp.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.4</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
       
     </div>
 
