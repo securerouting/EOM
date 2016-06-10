@@ -1,4 +1,4 @@
-AC_INIT(eom, 1.5, suresh@tislabs.com)
+AC_INIT(eom, 1.6, suresh@tislabs.com)
 
 AC_ARG_WITH([openssl],
 	    [AC_HELP_STRING([--with-openssl],[use bundled OpenSSL rather than system libraries], [])],

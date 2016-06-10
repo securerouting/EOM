@@ -1,4 +1,8 @@
 include LICENSE README 
+include configure.ac Makefile.in
+include openssl-*.gz
+recursive-include ext *
+recursive-include rpki *
 recursive-include eom *.py eom do_poll.py
 recursive-include eom_ui *
 recursive-include docs *
