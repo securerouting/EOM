@@ -25,20 +25,33 @@ eom package.
 * pyparsing
 * logging
 
-Installing a patched version of rpki-rtr
-----------------------------------------
-
-EOM also needs a couple of changes to be made to the rpki.rtr code. Util
-these changes are merged into the main rpki.net software distribution,
-the patch in the patches directory need to be applied by hand.
-
-
 Trigger setup
 -------------
 
 EOM assumes that the operator already has a pre-configured Trigger setup
 for router management. Information on configuring Trigger can be found
 on https://trigger.readthedocs.org/en/latest
+
+
+Building rpki-rtr
+-----------------
+
+The EOM tool relies on a (modified) rpki-rtr module in order to pull
+data from a rpki-rtr server. The code that provides this functionality
+must be built separately. In order to do so, use the following sequence
+of steps:
+
+::
+
+    $ autoconf
+    $ ./configure
+    $ make
+
+
+The specific changes made to the stock rpki-rtr distribution from the
+RPKI.net software can be viewed in the patch file stored in the
+'patches' directory.
+
 
 Installation of the EOM package (with CLI tools)
 ------------------------------------------------
