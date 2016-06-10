@@ -58,4 +58,4 @@ class EOMReporter:
                 if v[2]:
                     for (host, port, asn, prefix, prefixlen, max_prefixlen) in v[2]:
                         rpkirtrpfxstr = str(asn) + ":" + prefix + "/" + "[" + str(prefixlen) + '-' + str(max_prefixlen) + "]"
-                        print "\t" + host + ":" + port + ": " + rpkirtrpfxstr
+                        print "\t(" + host + ":" + port + ") " + rpkirtrpfxstr
