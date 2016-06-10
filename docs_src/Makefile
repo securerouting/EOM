@@ -126,6 +126,19 @@ latexpdf:
 	$(MAKE) -C $(BUILDDIR)/latex all-pdf
 	@echo "pdflatex finished; the PDF files are in $(BUILDDIR)/latex."
 
+xelatexpdf:
+	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) $(BUILDDIR)/latex
+	@echo "Running LaTeX files through xelatex..."
+	$(MAKE) PDFLATEX=xelatex -C $(BUILDDIR)/latex all-pdf
+	@echo "xelatex finished; the PDF files are in $(BUILDDIR)/latex."
+
+lualatex:
+	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) $(BUILDDIR)/latex
+	@echo "Running XeLaTeX files through lualatex..."
+	sed -i -e 's/pdflatex/lualatex/' $(BUILDDIR)/latex/Makefile
+	$(MAKE) -C $(BUILDDIR)/latex all-pdf
+	@echo "lualatex finished; the PDF files are in $(BUILDDIR)/latex."
+
 latexpdfja:
 	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) $(BUILDDIR)/latex
 	@echo "Running LaTeX files through platex and dvipdfmx..."

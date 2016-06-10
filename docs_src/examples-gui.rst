@@ -44,7 +44,7 @@ The ROA status can be one of the following:
 
 .. |valid| unicode:: U+2705
 .. |invalid| unicode:: U+274C
-.. |unknown| unicode:: U+003f
+.. |unknown| unicode:: U+2753
 
 |valid| : The ROA constraints matched 
 
@@ -52,8 +52,10 @@ The ROA status can be one of the following:
 
 |unknown| : No ROA matching the give prefix was found 
 
+
 The Network, NextHop, Origin, and Path fields correspond to the
-equivalent fields in the RIB entry.
+equivalent fields in the RIB entry. The field labeled 'B' indicates if
+the path refers to a best path in the routing table.
 
 The M, L and W fields map to the metric, local-pref and Weight fields of
 the RIB entry respectively.
