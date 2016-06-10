@@ -70,7 +70,8 @@ class RPKITestCase:
         # Update router ids
         for did in self.rtr_ids:
             # rtr_id|device
-            cur.execute("INSERT INTO rtr_cache (device) VALUES (?)", (did,))
+            didstr = "router" + str(did)
+            cur.execute("INSERT INTO rtr_cache (device, rtrupdt) VALUES (?, ?)", (didstr, now))
             
         # Update all VRPs
         for v in self.vrps:
@@ -101,6 +102,7 @@ class MapResourceTests(unittest.TestCase):
     def tearDown(self):
         try:
             os.remove(TEST_DB)
+            pass
         except OSError:
             pass
 
