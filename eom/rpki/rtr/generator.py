@@ -28,15 +28,15 @@ import base64
 import random
 import logging
 import subprocess
-import rpki.POW
-import rpki.oids
-import rpki.rtr.pdus
-import rpki.rtr.channels
-import rpki.rtr.server
+import eom.rpki.POW
+import eom.rpki.oids
+import eom.rpki.rtr.pdus
+import eom.rpki.rtr.channels
+import eom.rpki.rtr.server
 
-from rpki.rtr.channels import Timestamp
+from eom.rpki.rtr.channels import Timestamp
 
-class PrefixPDU(rpki.rtr.pdus.PrefixPDU):
+class PrefixPDU(eom.rpki.rtr.pdus.PrefixPDU):
   """
   Object representing one prefix.  This corresponds closely to one PDU
   in the rpki-router protocol, so closely that we use lexical ordering
@@ -57,7 +57,7 @@ class PrefixPDU(rpki.rtr.pdus.PrefixPDU):
     self = cls(version = version)
     self.asn = long(asn)
     p, l = addr.split("/")
-    self.prefix = rpki.POW.IPAddress(p)
+    self.prefix = eom.rpki.POW.IPAddress(p)
     if "-" in l:
       self.prefixlen, self.max_prefixlen = tuple(int(i) for i in l.split("-"))
     else:
@@ -100,7 +100,7 @@ class IPv6PrefixPDU(PrefixPDU):
   pdu_type = 6
   address_byte_count = 16
 
-class RouterKeyPDU(rpki.rtr.pdus.RouterKeyPDU):
+class RouterKeyPDU(eom.rpki.rtr.pdus.RouterKeyPDU):
   """
   Router Key PDU.
   """
@@ -134,7 +134,7 @@ class RouterKeyPDU(rpki.rtr.pdus.RouterKeyPDU):
     return self
 
 
-class ROA(rpki.POW.ROA):                # pylint: disable=W0232
+class ROA(eom.rpki.POW.ROA):                # pylint: disable=W0232
   """
   Minor additions to rpki.POW.ROA.
   """
@@ -155,7 +155,7 @@ class ROA(rpki.POW.ROA):                # pylint: disable=W0232
       for p in v6:
         yield p
 
-class X509(rpki.POW.X509):              # pylint: disable=W0232
+class X509(eom.rpki.POW.X509):              # pylint: disable=W0232
   """
   Minor additions to rpki.POW.X509.
   """
@@ -177,7 +177,7 @@ class PDUSet(list):
   """
 
   def __init__(self, version):
-    assert version in rpki.rtr.pdus.PDU.version_map
+    assert version in eom.rpki.rtr.pdus.PDU.version_map
     super(PDUSet, self).__init__()
     self.version = version
 
@@ -189,9 +189,9 @@ class PDUSet(list):
 
     self = cls(version = version)
     f = open(filename, "rb")
-    r = rpki.rtr.channels.ReadBuffer()
+    r = eom.rpki.rtr.channels.ReadBuffer()
     while True:
-      p = rpki.rtr.pdus.PDU.read_pdu(r)
+      p = eom.rpki.rtr.pdus.PDU.read_pdu(r)
       while p is None:
         b = f.read(r.needed())
         if b == "":
@@ -232,9 +232,9 @@ class AXFRSet(PDUSet):
     """
 
     self = cls(version = version)
-    self.serial = rpki.rtr.channels.Timestamp.now()
+    self.serial = eom.rpki.rtr.channels.Timestamp.now()
 
-    include_routercerts = RouterKeyPDU.pdu_type in rpki.rtr.pdus.PDU.version_map[version]
+    include_routercerts = RouterKeyPDU.pdu_type in eom.rpki.rtr.pdus.PDU.version_map[version]
 
     if scan_roas is None or (scan_routercerts is None and include_routercerts):
       for root, dirs, files in os.walk(rcynic_dir):     # pylint: disable=W0612
@@ -247,7 +247,7 @@ class AXFRSet(PDUSet):
           if include_routercerts and scan_routercerts is None and fn.endswith(".cer"):
             x = X509.derReadFile(os.path.join(root, fn))
             eku = x.getEKU()
-            if eku is not None and rpki.oids.id_kp_bgpsec_router in eku:
+            if eku is not None and eom.rpki.oids.id_kp_bgpsec_router in eku:
               ski = x.getSKI()
               key = x.getPublicKey().derWritePublic()
               self.extend(RouterKeyPDU.from_certificate(version = version, asn = asn, ski = ski, key = key)
@@ -292,7 +292,7 @@ class AXFRSet(PDUSet):
     assert fn1.isdigit() and fn2 == "ax" and fn3.startswith("v") and fn3[1:].isdigit()
     version = int(fn3[1:])
     self = cls._load_file(filename, version)
-    self.serial = rpki.rtr.channels.Timestamp(fn1)
+    self.serial = eom.rpki.rtr.channels.Timestamp(fn1)
     return self
 
   def filename(self):
@@ -308,7 +308,7 @@ class AXFRSet(PDUSet):
     Load current AXFRSet.  Return None if can't.
     """
 
-    serial = rpki.rtr.server.read_current(version)[0]
+    serial = eom.rpki.rtr.server.read_current(version)[0]
     if serial is None:
       return None
     try:
@@ -358,13 +358,13 @@ class AXFRSet(PDUSet):
     the new nonce invalidates all old serial numbers.
     """
 
-    assert self.version in rpki.rtr.pdus.PDU.version_map
-    old_serial, nonce = rpki.rtr.server.read_current(self.version)
+    assert self.version in eom.rpki.rtr.pdus.PDU.version_map
+    old_serial, nonce = eom.rpki.rtr.server.read_current(self.version)
     if old_serial is None or self.seq_ge(old_serial, self.serial):
       logging.debug("Creating new nonce and deleting stale data")
       nonce = self.new_nonce(force_zero_nonce)
       self.destroy_old_data()
-    rpki.rtr.server.write_current(self.serial, nonce, self.version)
+    eom.rpki.rtr.server.write_current(self.serial, nonce, self.version)
 
   def save_ixfr(self, other):
     """
@@ -425,8 +425,8 @@ class IXFRSet(PDUSet):
     assert fn1.isdigit() and fn2 == "ix" and fn3.isdigit() and fn4.startswith("v") and fn4[1:].isdigit()
     version = int(fn4[1:])
     self = cls._load_file(filename, version)
-    self.from_serial = rpki.rtr.channels.Timestamp(fn3)
-    self.to_serial = rpki.rtr.channels.Timestamp(fn1)
+    self.from_serial = eom.rpki.rtr.channels.Timestamp(fn3)
+    self.to_serial = eom.rpki.rtr.channels.Timestamp(fn1)
     return self
 
   def filename(self):
@@ -455,14 +455,14 @@ def kick_all(serial):
   """
 
   try:
-    os.stat(rpki.rtr.server.kickme_dir)
+    os.stat(eom.rpki.rtr.server.kickme_dir)
   except OSError:
-    logging.debug('# Creating directory "%s"', rpki.rtr.server.kickme_dir)
-    os.makedirs(rpki.rtr.server.kickme_dir)
+    logging.debug('# Creating directory "%s"', eom.rpki.rtr.server.kickme_dir)
+    os.makedirs(eom.rpki.rtr.server.kickme_dir)
 
   msg = "Good morning, serial %d is ready" % serial
   sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
-  for name in glob.iglob("%s.*" % rpki.rtr.server.kickme_base):
+  for name in glob.iglob("%s.*" % eom.rpki.rtr.server.kickme_base):
     try:
       logging.debug("# Kicking %s", name)
       sock.sendto(msg, name)
@@ -497,13 +497,13 @@ def cronjob_main(args):
       logging.critical(str(e))
       sys.exit(1)
 
-  for version in sorted(rpki.rtr.server.PDU.version_map.iterkeys(), reverse = True):
+  for version in sorted(eom.rpki.rtr.server.PDU.version_map.iterkeys(), reverse = True):
 
     logging.debug("# Generating updates for protocol version %d", version)
 
     old_ixfrs = glob.glob("*.ix.*.v%d" % version)
 
-    current = rpki.rtr.server.read_current(version)[0]
+    current = eom.rpki.rtr.server.read_current(version)[0]
     cutoff = Timestamp.now(-(24 * 60 * 60))
     for f in glob.iglob("*.ax.v%d" % version):
       t = Timestamp(int(f.split(".")[0]))
@@ -511,19 +511,19 @@ def cronjob_main(args):
         logging.debug("# Deleting old file %s, timestamp %s", f, t)
         os.unlink(f)
 
-    pdus = rpki.rtr.generator.AXFRSet.parse_rcynic(args.rcynic_dir, version, args.scan_roas, args.scan_routercerts)
-    if pdus == rpki.rtr.generator.AXFRSet.load_current(version):
+    pdus = eom.rpki.rtr.generator.AXFRSet.parse_rcynic(args.rcynic_dir, version, args.scan_roas, args.scan_routercerts)
+    if pdus == eom.rpki.rtr.generator.AXFRSet.load_current(version):
       logging.debug("# No change, new serial not needed")
       continue
     pdus.save_axfr()
     for axfr in glob.iglob("*.ax.v%d" % version):
       if axfr != pdus.filename():
-        pdus.save_ixfr(rpki.rtr.generator.AXFRSet.load(axfr))
+        pdus.save_ixfr(eom.rpki.rtr.generator.AXFRSet.load(axfr))
     pdus.mark_current(args.force_zero_nonce)
 
     logging.debug("# New serial is %d (%s)", pdus.serial, pdus.serial)
 
-    rpki.rtr.generator.kick_all(pdus.serial)
+    eom.rpki.rtr.generator.kick_all(pdus.serial)
 
     old_ixfrs.sort()
     for ixfr in old_ixfrs:
@@ -548,12 +548,12 @@ def show_main(args):
   g = glob.glob("*.ax.v*")
   g.sort()
   for f in g:
-    rpki.rtr.generator.AXFRSet.load(f).show()
+    eom.rpki.rtr.generator.AXFRSet.load(f).show()
 
   g = glob.glob("*.ix.*.v*")
   g.sort()
   for f in g:
-    rpki.rtr.generator.IXFRSet.load(f).show()
+    eom.rpki.rtr.generator.IXFRSet.load(f).show()
 
 def argparse_setup(subparsers):
   """

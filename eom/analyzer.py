@@ -13,8 +13,8 @@ import asyncore
 import sys
 import time
 
-from rpki.rtr.channels import Timestamp
-from rpki.rtr.client import PDU
+from eom.rpki.rtr.channels import Timestamp
+from eom.rpki.rtr.client import PDU
 from eom.rpki_rtr_cli import EOMRPKIRtrCli
 from eom.rtr_poller import EOMRtrRIBFetcher
 from eom.aggregator import EOMAggregator

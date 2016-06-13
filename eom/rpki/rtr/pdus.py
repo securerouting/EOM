@@ -23,7 +23,7 @@ PDU classes for the RPKI-RTR protocol (RFC 6810 et sequalia).
 import struct
 import base64
 import logging
-import rpki.POW
+import eom.rpki.POW
 
 # Exceptions
 
@@ -477,7 +477,7 @@ class PrefixPDU(PDU):
     assert version == self.version and pdu_type == self.pdu_type
     if length != len(b1) + len(b2) + len(b3):
       raise CorruptData("Got PDU length %d, expected %d" % (length, len(b1) + len(b2) + len(b3)), pdu = self)
-    self.prefix = rpki.POW.IPAddress.fromBytes(b2)
+    self.prefix = eom.rpki.POW.IPAddress.fromBytes(b2)
     self.asn = self.asnum_struct.unpack(b3)[0]
     assert b1 + b2 + b3 == self.to_pdu()
     return self

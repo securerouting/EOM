@@ -7,9 +7,9 @@ saved through the aggregator module to an internal data store.
 
 import asyncore
 import netaddr
-from rpki.rtr.client   import ClientChannel
-from rpki.rtr.channels import Timestamp
-from rpki.rtr.pdus     import ResetQueryPDU, SerialQueryPDU
+from eom.rpki.rtr.client   import ClientChannel
+from eom.rpki.rtr.channels import Timestamp
+from eom.rpki.rtr.pdus     import ResetQueryPDU, SerialQueryPDU
 
 from eom.generic_poller import EOMGenericPoller
 

@@ -53,12 +53,12 @@ def main():
   os.environ["TZ"] = "UTC"
   time.tzset()
 
-  from rpki.rtr.server    import argparse_setup as argparse_setup_server
-  from rpki.rtr.client    import argparse_setup as argparse_setup_client
-  from rpki.rtr.generator import argparse_setup as argparse_setup_generator
+  from eom.rpki.rtr.server    import argparse_setup as argparse_setup_server
+  from eom.rpki.rtr.client    import argparse_setup as argparse_setup_client
+  from eom.rpki.rtr.generator import argparse_setup as argparse_setup_generator
 
-  if "rpki.rtr.bgpdump" in sys.modules:
-    from rpki.rtr.bgpdump import argparse_setup as argparse_setup_bgpdump
+  if "eom.rpki.rtr.bgpdump" in sys.modules:
+    from eom.rpki.rtr.bgpdump import argparse_setup as argparse_setup_bgpdump
   else:
     def argparse_setup_bgpdump(ignored):
       pass

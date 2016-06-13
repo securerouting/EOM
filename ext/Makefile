@@ -2,7 +2,7 @@ all: build
 
 build:
 	python setup.py build
-	cp build/lib.*/rpki/POW/_POW.so ../rpki/POW/
+	cp build/lib.*/rpki/POW/_POW.so ../eom/rpki/POW/
 
 #install:
 #	python setup.py install --record installed

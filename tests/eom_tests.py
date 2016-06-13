@@ -12,7 +12,7 @@ from eom.analyzer import EOMAnalyzer
 from eom.aggregator import EOMAggregator
 from eom.reporter import EOMReporter
 from eom.generic_poller import EOMGenericPoller
-from rpki.rtr.channels import Timestamp
+from eom.rpki.rtr.channels import Timestamp
 
 TEST_DB = "/tmp/eom_test_db.sqlite"
 
