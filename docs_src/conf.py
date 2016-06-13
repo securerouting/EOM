@@ -218,10 +218,6 @@ latex_elements = {
 # Additional stuff for the LaTeX preamble.
 #'preamble': '',
  'preamble':'''
-    \usepackage{fontspec}
-    \setmainfont{Arial Unicode MS}
-    \setsansfont{Arial Unicode MS}
-    \setmonofont{Arial Unicode MS}
  '''
 
 # Latex figure (float) alignment
