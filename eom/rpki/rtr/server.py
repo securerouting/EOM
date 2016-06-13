@@ -27,12 +27,12 @@ import socket
 import signal
 import logging
 import asyncore
-import rpki.POW
-import rpki.oids
-import rpki.rtr.pdus
-import rpki.rtr.channels
+import eom.rpki.POW
+import eom.rpki.oids
+import eom.rpki.rtr.pdus
+import eom.rpki.rtr.channels
 
-from rpki.rtr.pdus import (clone_pdu_root, CacheResponsePDU, EndOfDataPDU, CacheResetPDU, SerialNotifyPDU)
+from eom.rpki.rtr.pdus import (clone_pdu_root, CacheResponsePDU, EndOfDataPDU, CacheResetPDU, SerialNotifyPDU)
 
 
 # Disable incremental updates.  Debugging only, should be False in production.
@@ -43,7 +43,7 @@ kickme_dir  = "sockets"
 kickme_base = os.path.join(kickme_dir, "kickme")
 
 
-class PDU(rpki.rtr.pdus.PDU):
+class PDU(eom.rpki.rtr.pdus.PDU):
   """
   Generic server PDU.
   """
@@ -81,7 +81,7 @@ clone_pdu = clone_pdu_root(PDU)
 
 
 @clone_pdu
-class SerialQueryPDU(PDU, rpki.rtr.pdus.SerialQueryPDU):
+class SerialQueryPDU(PDU, eom.rpki.rtr.pdus.SerialQueryPDU):
   """
   Serial Query PDU.
   """
@@ -119,7 +119,7 @@ class SerialQueryPDU(PDU, rpki.rtr.pdus.SerialQueryPDU):
 
 
 @clone_pdu
-class ResetQueryPDU(PDU, rpki.rtr.pdus.ResetQueryPDU):
+class ResetQueryPDU(PDU, eom.rpki.rtr.pdus.ResetQueryPDU):
   """
   Reset Query PDU.
   """
@@ -144,7 +144,7 @@ class ResetQueryPDU(PDU, rpki.rtr.pdus.ResetQueryPDU):
 
 
 @clone_pdu
-class ErrorReportPDU(rpki.rtr.pdus.ErrorReportPDU):
+class ErrorReportPDU(eom.rpki.rtr.pdus.ErrorReportPDU):
   """
   Error Report PDU.
   """
@@ -205,7 +205,7 @@ class FileProducer(object):
     return self.handle.read(self.buffersize)
 
 
-class ServerWriteChannel(rpki.rtr.channels.PDUChannel):
+class ServerWriteChannel(eom.rpki.rtr.channels.PDUChannel):
   """
   Kludge to deal with ssh's habit of sometimes (compile time option)
   invoking us with two unidirectional pipes instead of one
@@ -241,7 +241,7 @@ class ServerWriteChannel(rpki.rtr.channels.PDUChannel):
         raise
 
 
-class ServerChannel(rpki.rtr.channels.PDUChannel):
+class ServerChannel(eom.rpki.rtr.channels.PDUChannel):
   """
   Server protocol engine, handles upcalls from PDUChannel to
   implement protocol logic.
@@ -488,8 +488,8 @@ def server_main(args):
 
   kickme = None
   try:
-    server = rpki.rtr.server.ServerChannel(logger = logger, refresh = args.refresh, retry = args.retry, expire = args.expire)
-    kickme = rpki.rtr.server.KickmeChannel(server = server)
+    server = eom.rpki.rtr.server.ServerChannel(logger = logger, refresh = args.refresh, retry = args.retry, expire = args.expire)
+    kickme = eom.rpki.rtr.server.KickmeChannel(server = server)
     asyncore.loop(timeout = None)
     signal.signal(signal.SIGINT, signal.SIG_IGN) # Theorized race condition
   except KeyboardInterrupt:
@@ -564,13 +564,13 @@ def argparse_setup(subparsers):
   # more useful error messages on argparse failures.
 
   def refresh(v):
-    return rpki.rtr.pdus.valid_refresh(int(v))
+    return eom.rpki.rtr.pdus.valid_refresh(int(v))
 
   def retry(v):
-    return rpki.rtr.pdus.valid_retry(int(v))
+    return eom.rpki.rtr.pdus.valid_retry(int(v))
 
   def expire(v):
-    return rpki.rtr.pdus.valid_expire(int(v))
+    return eom.rpki.rtr.pdus.valid_expire(int(v))
 
   # Some duplication of arguments here, not enough to be worth huge
   # effort to clean up, worry about it later in any case.

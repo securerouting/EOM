@@ -29,20 +29,20 @@ import logging
 import asyncore
 import subprocess
 import bisect
-import rpki.POW
-import rpki.oids
-import rpki.rtr.pdus
-import rpki.rtr.server
-import rpki.rtr.generator
+import eom.rpki.POW
+import eom.rpki.oids
+import eom.rpki.rtr.pdus
+import eom.rpki.rtr.server
+import eom.rpki.rtr.generator
 
-from rpki.rtr.channels import Timestamp
+from eom.rpki.rtr.channels import Timestamp
 
 
 class IgnoreThisRecord(Exception):
   pass
 
 
-class PrefixPDU(rpki.rtr.generator.PrefixPDU):
+class PrefixPDU(eom.rpki.rtr.generator.PrefixPDU):
 
   @staticmethod
   def from_bgpdump(line, rib_dump):
@@ -51,11 +51,11 @@ class PrefixPDU(rpki.rtr.generator.PrefixPDU):
       fields = line.split("|")
 
       # Parse prefix, including figuring out IP protocol version
-      cls = rpki.rtr.generator.IPv6PrefixPDU if ":" in fields[5] else rpki.rtr.generator.IPv4PrefixPDU
+      cls = eom.rpki.rtr.generator.IPv6PrefixPDU if ":" in fields[5] else eom.rpki.rtr.generator.IPv4PrefixPDU
       self = cls()
       self.timestamp = Timestamp(fields[1])
       p, l = fields[5].split("/")
-      self.prefix = rpki.POW.IPAddress(p)
+      self.prefix = eom.rpki.POW.IPAddress(p)
       self.prefixlen = self.max_prefixlen = int(l)
 
       # Withdrawals don't have AS paths, so be careful
@@ -89,7 +89,7 @@ class PrefixPDU(rpki.rtr.generator.PrefixPDU):
       raise IgnoreThisRecord
 
 
-class AXFRSet(rpki.rtr.generator.AXFRSet):
+class AXFRSet(eom.rpki.rtr.generator.AXFRSet):
 
   @staticmethod
   def read_bgpdump(filename):
@@ -155,7 +155,7 @@ def bgpdump_convert_main(args):
   first = True
   db = None
   axfrs = []
-  version = max(rpki.rtr.pdus.PDU.version_map.iterkeys())
+  version = max(eom.rpki.rtr.pdus.PDU.version_map.iterkeys())
 
   for filename in args.files:
 
@@ -176,7 +176,7 @@ def bgpdump_convert_main(args):
       sys.exit("First argument must be a RIB dump or .ax file, don't know what to do with %s" % filename)
 
     logging.debug("DB serial now %d (%s)", db.serial, db.serial)
-    if first and rpki.rtr.server.read_current(version) == (None, None):
+    if first and eom.rpki.rtr.server.read_current(version) == (None, None):
       db.mark_current()
     first = False
 
@@ -207,15 +207,15 @@ def bgpdump_select_main(args):
   serial = Timestamp(head)
   version = int(tail[4:])
 
-  if version not in rpki.rtr.pdus.PDU.version_map:
+  if version not in eom.rpki.rtr.pdus.PDU.version_map:
     sys.exit("Unknown protocol version %d" % version)
 
-  nonce = rpki.rtr.server.read_current(version)[1]
+  nonce = eom.rpki.rtr.server.read_current(version)[1]
   if nonce is None:
-    nonce = rpki.rtr.generator.new_nonce()
+    nonce = eom.rpki.rtr.generator.new_nonce()
 
-  rpki.rtr.server.write_current(serial, nonce, version)
-  rpki.rtr.generator.kick_all(serial)
+  eom.rpki.rtr.server.write_current(serial, nonce, version)
+  eom.rpki.rtr.generator.kick_all(serial)
 
 
 class BGPDumpReplayClock(object):
@@ -238,7 +238,7 @@ class BGPDumpReplayClock(object):
     self.timestamps = [Timestamp(int(f.split(".")[0])) for f in glob.iglob("*.ax.v*")]
     self.timestamps.sort()
     self.offset = self.timestamps[0] - int(time.time())
-    self.nonce = rpki.rtr.generator.new_nonce()
+    self.nonce = eom.rpki.rtr.generator.new_nonce()
 
   def __nonzero__(self):
     return len(self.timestamps) > 0
@@ -278,7 +278,7 @@ def bgpdump_server_main(args):
   You have been warned.
   """
 
-  logger = logging.LoggerAdapter(logging.root, dict(connection = rpki.rtr.server._hostport_tag()))
+  logger = logging.LoggerAdapter(logging.root, dict(connection = eom.rpki.rtr.server._hostport_tag()))
 
   logger.debug("[Starting]")
 
@@ -292,10 +292,10 @@ def bgpdump_server_main(args):
   # module with a bound method to our clock object.  Fun stuff, huh?
   #
   clock = BGPDumpReplayClock()
-  rpki.rtr.server.read_current = clock.read_current
+  eom.rpki.rtr.server.read_current = clock.read_current
 
   try:
-    server = rpki.rtr.server.ServerChannel(logger = logger)
+    server = eom.rpki.rtr.server.ServerChannel(logger = logger)
     old_serial = server.get_serial()
     logger.debug("[Starting at serial %d (%s)]", old_serial, old_serial)
     while clock:

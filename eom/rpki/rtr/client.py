@@ -28,14 +28,14 @@ import signal
 import logging
 import asyncore
 import subprocess
-import rpki.rtr.pdus
-import rpki.rtr.channels
+import eom.rpki.rtr.pdus
+import eom.rpki.rtr.channels
 
-from rpki.rtr.pdus     import ResetQueryPDU, SerialQueryPDU
-from rpki.rtr.channels import Timestamp
+from eom.rpki.rtr.pdus     import ResetQueryPDU, SerialQueryPDU
+from eom.rpki.rtr.channels import Timestamp
 
 
-class PDU(rpki.rtr.pdus.PDU):
+class PDU(eom.rpki.rtr.pdus.PDU):
 
   def consume(self, client):
     """
@@ -46,11 +46,11 @@ class PDU(rpki.rtr.pdus.PDU):
     logging.debug(self)
 
 
-clone_pdu = rpki.rtr.pdus.clone_pdu_root(PDU)
+clone_pdu = eom.rpki.rtr.pdus.clone_pdu_root(PDU)
 
 
 @clone_pdu
-class SerialNotifyPDU(rpki.rtr.pdus.SerialNotifyPDU):
+class SerialNotifyPDU(eom.rpki.rtr.pdus.SerialNotifyPDU):
 
   def consume(self, client):
     """
@@ -70,7 +70,7 @@ class SerialNotifyPDU(rpki.rtr.pdus.SerialNotifyPDU):
 
 
 @clone_pdu
-class CacheResponsePDU(rpki.rtr.pdus.CacheResponsePDU):
+class CacheResponsePDU(eom.rpki.rtr.pdus.CacheResponsePDU):
 
   def consume(self, client):
     """
@@ -83,7 +83,7 @@ class CacheResponsePDU(rpki.rtr.pdus.CacheResponsePDU):
       client.cache_reset()
 
 @clone_pdu
-class EndOfDataPDUv0(rpki.rtr.pdus.EndOfDataPDUv0):
+class EndOfDataPDUv0(eom.rpki.rtr.pdus.EndOfDataPDUv0):
 
   def consume(self, client):
     """
@@ -94,7 +94,7 @@ class EndOfDataPDUv0(rpki.rtr.pdus.EndOfDataPDUv0):
     client.end_of_data(self.version, self.serial, self.nonce, self.refresh, self.retry, self.expire)
 
 @clone_pdu
-class EndOfDataPDUv1(rpki.rtr.pdus.EndOfDataPDUv1):
+class EndOfDataPDUv1(eom.rpki.rtr.pdus.EndOfDataPDUv1):
 
   def consume(self, client):
     """
@@ -106,7 +106,7 @@ class EndOfDataPDUv1(rpki.rtr.pdus.EndOfDataPDUv1):
 
 
 @clone_pdu
-class CacheResetPDU(rpki.rtr.pdus.CacheResetPDU):
+class CacheResetPDU(eom.rpki.rtr.pdus.CacheResetPDU):
 
   def consume(self, client):
     """
@@ -118,7 +118,7 @@ class CacheResetPDU(rpki.rtr.pdus.CacheResetPDU):
     client.push_pdu(ResetQueryPDU(version = client.version))
 
 
-class PrefixPDU(rpki.rtr.pdus.PrefixPDU):
+class PrefixPDU(eom.rpki.rtr.pdus.PrefixPDU):
   """
   Object representing one prefix.  This corresponds closely to one PDU
   in the rpki-router protocol, so closely that we use lexical ordering
@@ -139,19 +139,19 @@ class PrefixPDU(rpki.rtr.pdus.PrefixPDU):
 
 
 @clone_pdu
-class IPv4PrefixPDU(PrefixPDU, rpki.rtr.pdus.IPv4PrefixPDU):
+class IPv4PrefixPDU(PrefixPDU, eom.rpki.rtr.pdus.IPv4PrefixPDU):
   pass
 
 @clone_pdu
-class IPv6PrefixPDU(PrefixPDU, rpki.rtr.pdus.IPv6PrefixPDU):
+class IPv6PrefixPDU(PrefixPDU, eom.rpki.rtr.pdus.IPv6PrefixPDU):
   pass
 
 @clone_pdu
-class ErrorReportPDU(PDU, rpki.rtr.pdus.ErrorReportPDU):
+class ErrorReportPDU(PDU, eom.rpki.rtr.pdus.ErrorReportPDU):
   pass
 
 @clone_pdu
-class RouterKeyPDU(rpki.rtr.pdus.RouterKeyPDU):
+class RouterKeyPDU(eom.rpki.rtr.pdus.RouterKeyPDU):
   """
   Router Key PDU.
   """
@@ -165,7 +165,7 @@ class RouterKeyPDU(rpki.rtr.pdus.RouterKeyPDU):
     client.consume_routerkey(self)
 
 
-class ClientChannel(rpki.rtr.channels.PDUChannel):
+class ClientChannel(eom.rpki.rtr.channels.PDUChannel):
   """
   Client protocol engine, handles upcalls from PDUChannel.
   """
@@ -176,9 +176,9 @@ class ClientChannel(rpki.rtr.channels.PDUChannel):
   host     = None
   port     = None
   cache_id = None
-  refresh  = rpki.rtr.pdus.default_refresh
-  retry    = rpki.rtr.pdus.default_retry
-  expire   = rpki.rtr.pdus.default_expire
+  refresh  = eom.rpki.rtr.pdus.default_refresh
+  retry    = eom.rpki.rtr.pdus.default_retry
+  expire   = eom.rpki.rtr.pdus.default_expire
   updated  = Timestamp(0)
 
   def __init__(self, sock, proc, killsig, args, host = None, port = None):
