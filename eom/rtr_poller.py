@@ -11,7 +11,7 @@ http://stackoverflow.com/questions/30997205/pyparsing-parsing-ciscos-show-ip-bgp
 import subprocess
 import json
 import re
-from rpki.rtr.channels import Timestamp
+from eom.rpki.rtr.channels import Timestamp
 from eom.generic_poller import EOMGenericPoller
 from pprint import pprint
 import netaddr

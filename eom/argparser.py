@@ -8,7 +8,7 @@ provides the defaults).
 
 import argparse
 import yaml
-from rpki.rtr.pdus import PDU
+from eom.rpki.rtr.pdus import PDU
 
 class rpki_server_spec:
 
